@@ -1,0 +1,49 @@
+{
+  "author": {
+    "name": "wztlink1013",
+    "email": "wztlink1013@163.com"
+  },
+  "bin": {
+    "yuque-hexo-lyrics": "bin/yuque-hexo-lyrics.js"
+  },
+  "bugs": {
+    "url": "https://github.com/wztlink1013/yuque-hexo-lyrics/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "@yuque/sdk": "^1.1.1",
+    "chalk": "^2.4.1",
+    "common-bin": "^2.7.3",
+    "debug": "^3.1.0",
+    "depd": "^2.0.0",
+    "ejs": "^2.6.1",
+    "filenamify": "^4.1.0",
+    "hexo-front-matter": "^0.2.3",
+    "html-entities": "^1.2.1",
+    "lodash": "^4.17.10",
+    "mkdirp": "^1.0.0",
+    "moment": "^2.22.2",
+    "prettier": "^2.0.4",
+    "queue": "^4.5.0",
+    "rimraf": "^2.6.2",
+    "update-check": "^1.5.3",
+    "urllib": "^2.29.1"
+  },
+  "deprecated": false,
+  "description": "An updated version of the yuque-hexo (A downloader for articles from yuque) ",
+  "directories": {
+    "lib": "lib"
+  },
+  "homepage": "https://github.com/wztlink1013/yuque-hexo-lyrics#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "name": "yuque-hexo-lyrics",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wztlink1013/yuque-hexo-lyrics.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0"
+}
