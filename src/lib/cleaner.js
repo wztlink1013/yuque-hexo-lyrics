@@ -1,5 +1,3 @@
-'use strict';
-
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -9,9 +7,8 @@ const out = require('./out');
 const cwd = process.cwd();
 
 module.exports = {
-  // clear directory of generated posts
   cleanPosts() {
-    for(let i in config) {
+    for (let i in config) {
       const config_item = config[i];
       const { postPath } = config_item;
       const dist = path.join(cwd, postPath);
@@ -20,7 +17,6 @@ module.exports = {
     }
   },
 
-  // clear cache of posts' data
   clearCache() {
     const cachePath = path.join(cwd, 'yuque.json');
     try {
@@ -31,9 +27,8 @@ module.exports = {
     }
   },
 
-  // clear last generated timestamp file
   clearLastGenerate() {
-    for(let i in config) {
+    for (let i in config) {
       const config_item = config[i];
       const { lastGeneratePath } = config_item;
       if (!lastGeneratePath) {
@@ -43,5 +38,5 @@ module.exports = {
       out.info(`remove last generated timestamp: ${dist}`);
       rimraf.sync(dist);
     }
-  },
+  }
 };

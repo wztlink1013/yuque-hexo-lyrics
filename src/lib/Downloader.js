@@ -1,35 +1,9 @@
-'use strict';
-
 const path = require('path');
-/**
- * 文件系统模块
- * 负责读写等操作
- */
 const fs = require('fs');
-/**
- * mkdirp这是一款在node.js中像mkdir -p一样递归创建目录及其子目录。
- * https://www.cnblogs.com/jiaoshou/p/12187136.html
- */
 const mkdirp = require('mkdirp');
-/**
- * Lodash 是一个一致性、模块化、高性能的 JavaScript 实用工具库。
- * https://www.lodashjs.com/
- */
 const lodash = require('lodash');
-/**
- * Node.js 中的队列
- * https://www.npmjs.com/package/queue
- */
 const Queue = require('queue');
-/**
- * filenamify - 将一个字符串转换为一个有效的安全的文件名
- * https://github.com/sindresorhus/filenamify#readme
- */
 const filenamify = require('filenamify');
-
-/**
- * 各个工具类
- */
 const YuqueClient = require('./yuque');
 const { isPost } = require('../util');
 const out = require('./out');
@@ -43,7 +17,7 @@ const toc_list = {};
 // 需要提取的文章属性字段
 const PICK_PROPERTY = [
   'title', // 标题
-  'description',// 描述
+  'description', // 描述
   'created_at', // 文档创建日期
   'updated_at', // 文档更新日期
   'published_at', //文档发布日期
@@ -51,7 +25,7 @@ const PICK_PROPERTY = [
   'slug', // slug
   'last_editor', //
   'public', //公开与否，不过hexo.js文件不能用，因为这里已经被处理了
-  'word_count', //字数统计
+  'word_count' //字数统计
 ];
 
 /**
@@ -74,7 +48,9 @@ class Downloader {
     this.cachePath = path.join(cwd, config.cachePath);
     // markdown目录
     this.postBasicPath = path.join(cwd, config.postPath);
-    this.lastGeneratePath = config.lastGeneratePath ? path.join(cwd, config.lastGeneratePath) : '';
+    this.lastGeneratePath = config.lastGeneratePath
+      ? path.join(cwd, config.lastGeneratePath)
+      : '';
     // 文章列表
     this._cachedArticles = [];
     this.fetchArticle = this.fetchArticle.bind(this);
@@ -91,7 +67,6 @@ class Downloader {
         out.warn(`get last generate time err: ${error}`);
       }
     }
-
   }
 
   /**
@@ -104,7 +79,7 @@ class Downloader {
    */
   fetchArticle(item, index) {
     const { client, _cachedArticles } = this;
-    return function() {
+    return function () {
       out.info(`download article body: ${item.title}`);
       return client.getArticle(item.slug).then(({ data: article }) => {
         _cachedArticles[index] = article;
@@ -129,10 +104,11 @@ class Downloader {
     out.info(`article amount: ${articles.data.length}`);
     // 对拉取到的articles的data数组进行筛选
     const realArticles = articles.data
-      .filter(article => (config.onlyPublished ? !!article.published_at : true))
-      .filter(article => (config.onlyPublic ? !!article.public : true))
-      .map(article => lodash.pick(article, PICK_PROPERTY));
-
+      .filter((article) =>
+        config.onlyPublished ? !!article.published_at : true
+      )
+      .filter((article) => (config.onlyPublic ? !!article.public : true))
+      .map((article) => lodash.pick(article, PICK_PROPERTY));
 
     const queue = new Queue({ concurrency: config.concurrency });
 
@@ -141,7 +117,7 @@ class Downloader {
     let cacheArticle;
     let cacheAvaliable;
 
-    const findIndexFn = function(item) {
+    const findIndexFn = function (item) {
       return item.slug === article.slug;
     };
 
@@ -165,7 +141,7 @@ class Downloader {
     }
 
     return new Promise((resolve, reject) => {
-      queue.start(function(err) {
+      queue.start(function (err) {
         if (err) return reject(err);
         out.info('download articles done!');
         resolve();
@@ -176,30 +152,29 @@ class Downloader {
   /**
    * 下载知识库目录
    */
-   async fetchToc() {
+  async fetchToc() {
     const { client } = this;
     const toc = await client.getToc();
-    out.info(`download toc!!!!!!!!!`);
+    out.info(`download toc.`);
     const data = toc.data;
     // // 存放各个slug对应的分类
     // const toc_list = {};
 
-    for (let i = 0;i<data.length;i++) {
+    for (let i = 0; i < data.length; i++) {
       let item = data[i];
-      let item_info = {};
       // 如果数组元素是文档
-      if(item.type === "DOC") {
+      if (item.type === 'DOC') {
         let cates = [];
         const item_slug = item.slug;
-        if (item.parent_uuid === "") {
+        if (item.parent_uuid === '') {
           // 没有目录的文档
           cates = [];
         } else {
           // 该文档有其父级
           // 向前找这篇文档的父级目录
           // 写一个递归！
-          for (let j = i-1;j>=0;j--) {
-            if(data[j].depth === item.depth-1 && data[j].type === "TITLE") {
+          for (let j = i - 1; j >= 0; j--) {
+            if (data[j].depth === item.depth - 1 && data[j].type === 'TITLE') {
               cates.unshift(data[j].title);
               item.depth--;
               continue;
@@ -213,7 +188,6 @@ class Downloader {
       }
     }
   }
-
 
   /**
    * 读取语雀的文章缓存 json 文件
@@ -241,7 +215,7 @@ class Downloader {
     const { cachePath, _cachedArticles } = this;
     out.info(`writing to local file: ${cachePath}`);
     fs.writeFileSync(cachePath, JSON.stringify(_cachedArticles, null, 2), {
-      encoding: 'UTF8',
+      encoding: 'UTF8'
     });
   }
 
@@ -277,12 +251,12 @@ class Downloader {
       // console.log(post.public);
       // 写一串代码，生成一个参数，放
       secret = post.public;
-      belong_book = post.book.slug
+      belong_book = post.book.slug;
       const search_slug = post.slug;
       if (toc_list[search_slug]) {
         cates = toc_list[search_slug];
       } else {
-        cates = "";
+        cates = '';
       }
       // console.log(cates);
     } catch (error) {
@@ -290,9 +264,9 @@ class Downloader {
       process.exit(-1);
     }
     out.info(`generate post file: ${postPath}`);
-    const text = transform(post,cates,secret,belong_book);
+    const text = transform(post, cates, secret, belong_book);
     fs.writeFileSync(postPath, text, {
-      encoding: 'UTF8',
+      encoding: 'UTF8'
     });
   }
 

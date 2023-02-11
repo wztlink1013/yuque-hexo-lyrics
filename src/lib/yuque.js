@@ -1,9 +1,3 @@
-'use strict';
-
-/**
- * https://github.com/yuque/sdk
- * 补充yuque的node的sdk，比如说配置
- */
 const SDK = require('@yuque/sdk');
 
 function handler(res) {
@@ -24,12 +18,12 @@ class YuqueClient extends SDK {
   constructor(config) {
     const { baseUrl, login, repo, token, timeout } = config;
     const endpoint = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-    const requestOpts = { timeout, };
+    const requestOpts = { timeout };
     const superConfig = {
       endpoint,
       token,
       handler,
-      requestOpts,
+      requestOpts
     };
     super(superConfig);
     this.namespace = `${login}/${repo}`;

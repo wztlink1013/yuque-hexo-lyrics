@@ -1,24 +1,22 @@
-"use strict";
-
-const ejs = require("ejs");
-const Entities = require("html-entities").AllHtmlEntities;
-const FrontMatter = require("hexo-front-matter");
-const { formatDate, formatRaw } = require("../util");
+const ejs = require('ejs');
+const Entities = require('html-entities').AllHtmlEntities;
+const FrontMatter = require('hexo-front-matter');
+const { formatDate, formatRaw } = require('../util');
 
 const entities = new Entities();
 // 背景色区块支持
 const colorBlocks = {
-  ":::tips\n":
+  ':::tips\n':
     '<div style="background: #FFFBE6;padding:10px;border: 1px solid #C3C3C3;border-radius:5px;margin-bottom:5px;">',
-  ":::danger\n":
+  ':::danger\n':
     '<div style="background: #FFF3F3;padding:10px;border: 1px solid #DEB8BE;border-radius:5px;margin-bottom:5px;">',
-  ":::info\n":
+  ':::info\n':
     '<div style="background: #E8F7FF;padding:10px;border: 1px solid #ABD2DA;border-radius:5px;margin-bottom:5px;">',
-  ":::warning\n":
+  ':::warning\n':
     '<div style="background: #fffbe6;padding:10px;border: 1px solid #e0d1b1;border-radius:5px;margin-bottom:5px;">',
-  ":::success\n":
+  ':::success\n':
     '<div style="background: #edf9e8;padding:10px;border: 1px solid #c2d2b5;border-radius:5px;margin-bottom:5px;">',
-  "\\s+:::": "</div>",
+  '\\s+:::': '</div>'
 };
 
 // 文章模板
@@ -39,11 +37,12 @@ function parseMatter(body) {
     // front matter信息的<br/>换成 \n
     const regex = /(title:|layout:|tags:|date:|categories:){1}(\S|\s)+?---/gi;
     body = body.replace(regex, (a) =>
-      a.replace(/(<br \/>|<br>|<br\/>)/gi, "\n")
+      // eslint-disable-next-line prettier/prettier
+      a.replace(/(<br \/>|<br>|<br\/>)/gi, '\n')
     );
     // 支持提示区块语法
     for (const key in colorBlocks) {
-      body = body.replace(new RegExp(key, "igm"), colorBlocks[key]);
+      body = body.replace(new RegExp(key, 'igm'), colorBlocks[key]);
     }
     const result = FrontMatter.parse(body);
     result.body = result._content;
@@ -54,7 +53,7 @@ function parseMatter(body) {
     return result;
   } catch (error) {
     return {
-      body,
+      body
     };
   }
 }
@@ -70,15 +69,8 @@ module.exports = function (post, cates, secret, belong_book) {
   const parseRet = parseMatter(post.body); // 格式化body
   const { body, ...data } = parseRet;
   // public接口不能用，只能在generatePost函数中用传参的形式放进来
-  const {
-    title,
-    slug: urlname,
-    created_at,
-    description,
-    updated_at,
-    word_count,
-    cover,
-  } = post;
+  // 还有：description updated_at cover
+  const { title, slug: urlname, created_at, word_count } = post;
   // console.log(title,cover);
 
   let raw = formatRaw(body); // util工具里面的格式化markdown函数
@@ -89,7 +81,7 @@ module.exports = function (post, cates, secret, belong_book) {
   const tags = data.tags || [];
   const categories = cates || data.categories || [];
   const props = {
-    title: title.replace(/"/g, ""), // 临时去掉标题中的引号，至少保证文章页面是正常可访问的
+    title: title.replace(/"/g, ''), // 临时去掉标题中的引号，至少保证文章页面是正常可访问的
     urlname,
     date,
     ...data,
@@ -97,11 +89,11 @@ module.exports = function (post, cates, secret, belong_book) {
     categories,
     word_count: word_count,
     secret: secret,
-    belong_book: belong_book,
+    belong_book: belong_book
   };
   const text = ejs.render(template, {
     raw,
-    matter: FrontMatter.stringify(props),
+    matter: FrontMatter.stringify(props)
   });
   return text;
 };

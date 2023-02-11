@@ -1,18 +1,7 @@
-'use strict';
-
 const path = require('path');
-const lodash = require('lodash');
 const out = require('./lib/out');
 
-/**
- * process.cwd() 方法会返回 Node.js 进程的当前工作目录。
- * https://www.jianshu.com/p/a80c59abd1fb
- */
 const cwd = process.cwd();
-/**
- * 环境变量
- * https://segmentfault.com/a/1190000011683741
- */
 const token = process.env.YUQUE_TOKEN;
 
 // 默认的配置
@@ -22,14 +11,14 @@ const defaultConfig_essay = {
   lastGeneratePath: '',
   mdNameFormat: 'title',
   baseUrl: 'https://www.yuque.com/api/v2/', //sdk
-  token,//sdk
-  login: '',//sdk
-  repo: '',//sdk
+  token, //sdk
+  login: '', //sdk
+  repo: '', //sdk
   adapter: 'hexo',
   concurrency: 5,
   onlyPublished: false,
   onlyPublic: false,
-  timeout: '60s',//sdk
+  timeout: '60s' //sdk
 };
 // 实际配置
 // "yuqueConfig_dsal": {
@@ -44,8 +33,6 @@ const defaultConfig_essay = {
 //   "adapter": "hexo",
 //   "timeout": "100s"
 // }
-
-
 
 /**
  * 加载package.json里面的配置
@@ -63,10 +50,10 @@ function loadConfig() {
   // TODO: 想办法提取多个知识库的配置字段，用正则表达式找出yuqueConfig开头的属性
   // 找出package.json中yuqueConfig单词开头的字段
   let config_array = [];
-  for (let i = 0;i<Object.keys(pkg).length;i++) {
+  for (let i = 0; i < Object.keys(pkg).length; i++) {
     const item = Object.keys(pkg)[i];
     // 正则表达式匹配属性的前几个字母字段，不用正则，用indexOf把
-    if (item.indexOf("yuqueConfig") !== -1) {
+    if (item.indexOf('yuqueConfig') !== -1) {
       config_array.push(item);
     }
   }
@@ -80,9 +67,13 @@ function loadConfig() {
   // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
   let config = {};
-  for (let i = 0;i<config_array.length;i++) {
+  for (let i = 0; i < config_array.length; i++) {
     // let config_array_item = config_array[i];
-    config[config_array[i]] = Object.assign({}, defaultConfig_essay, pkg[config_array[i]]);
+    config[config_array[i]] = Object.assign(
+      {},
+      defaultConfig_essay,
+      pkg[config_array[i]]
+    );
   }
   // const config_dsal = Object.assign({}, defaultConfig_essay, yuqueConfig_dsal);
   // const config_essay = Object.assign({}, defaultConfig_essay, yuqueConfig_essay);

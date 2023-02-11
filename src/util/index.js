@@ -1,30 +1,17 @@
-'use strict';
-
-// Moment.js是一个JavaScript的日期、时间处理工具类
-// https://itbilu.com/nodejs/npm/VkCir3rge.html
 const moment = require('moment');
-// Lodash 是一个一致性、模块化、高性能的 JavaScript 实用工具库。
-// https://www.lodashjs.com/
 const lodash = require('lodash');
-/**
- * 将代码执行的效果打印到控制台
- */
 const out = require('../lib/out');
 
-
-/**
- * prettier自动规范代码，格式化markdown
- * https://zhuanlan.zhihu.com/p/87586114
- * 立即调用函数
- */
 const formatMarkdown = (() => {
   let prettier;
   try {
     prettier = require('prettier');
-    return body => prettier.format(body, { parser: 'markdown' });
+    return (body) => prettier.format(body, { parser: 'markdown' });
   } catch (error) {
-    out.warn('Node 8 doesn\'t support prettier@latest (see: https://github.com/prettier/eslint-config-prettier/issues/140), the markdown will not be formated.');
-    return body => body;
+    out.warn(
+      "Node 8 doesn't support prettier@latest (see: https://github.com/prettier/eslint-config-prettier/issues/140), the markdown will not be formated."
+    );
+    return (body) => body;
   }
 })();
 
@@ -73,6 +60,7 @@ function formatRaw(body) {
   const brBug = /<br \/>/g;
   const hiddenContent = /<div style="display:none">[\s\S]*?<\/div>/gi;
   // 删除语雀特有的锚点
+  // eslint-disable-next-line no-useless-escape
   const emptyAnchor = /<a name=\".*?\"><\/a>/g;
   body = body
     .replace(hiddenContent, '')

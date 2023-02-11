@@ -1,19 +1,54 @@
 {
-  "author": {
-    "name": "wztlink1013",
-    "email": "wztlink1013@163.com"
-  },
+  "name": "yuque-hexo-lyrics",
+  "version": "1.0.4",
+  "description": "A downloader for articles from yuque",
+  "author": "wztlink1013",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "jsnext:main": "dist/index.esm.js",
+  "module": "dist/index.esm.js",
+  "sideEffects": false,
   "bin": {
-    "yuque-hexo-lyrics": "bin/yuque-hexo-lyrics.js"
+    "yuque-hexo-lyrics": "dist/index.js"
+  },
+  "scripts": {
+    "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text mocha",
+    "lint": "eslint src config test",
+    "lint:prettier": "prettier --check .",
+    "build:self": "rollup -c config/rollup.config.js",
+    "build:esm": "rollup -c config/rollup.config.esm.js",
+    "build:aio": "rollup -c config/rollup.config.aio.js",
+    "build": "npm run build:self && npm run build:esm && npm run build:aio",
+    "ci": "commit",
+    "cz": "git-cz",
+    "sv": "standard-version --dry-run",
+    "test:puppeteer": "node test/browser/puppeteer.js",
+    "prepare": "husky install"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
   },
   "bugs": {
     "url": "https://github.com/wztlink1013/yuque-hexo-lyrics/issues"
   },
-  "bundleDependencies": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wztlink1013/yuque-hexo-lyrics.git"
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "homepage": "https://github.com/wztlink1013/yuque-hexo-lyrics#readme",
   "dependencies": {
+    "@babel/runtime-corejs2": "^7.12.5",
+    "@babel/runtime-corejs3": "^7.12.5",
     "@yuque/sdk": "^1.1.1",
     "chalk": "^2.4.1",
     "common-bin": "^2.7.3",
+    "core-js": "^3.7.0",
     "debug": "^3.1.0",
     "depd": "^2.0.0",
     "ejs": "^2.6.1",
@@ -23,27 +58,39 @@
     "lodash": "^4.17.10",
     "mkdirp": "^1.0.0",
     "moment": "^2.22.2",
-    "prettier": "^2.0.4",
     "queue": "^4.5.0",
     "rimraf": "^2.6.2",
     "update-check": "^1.5.3",
     "urllib": "^2.29.1"
   },
-  "deprecated": false,
-  "description": "An updated version of the yuque-hexo (A downloader for articles from yuque) ",
-  "directories": {
-    "lib": "lib"
-  },
-  "homepage": "https://github.com/wztlink1013/yuque-hexo-lyrics#readme",
-  "license": "MIT",
-  "main": "index.js",
-  "name": "yuque-hexo-lyrics",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wztlink1013/yuque-hexo-lyrics.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "version": "1.0.3"
+  "devDependencies": {
+    "@jslib-book/cli": "^1.0.0",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
+    "rollup": "^0.57.1",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-node-resolve": "^3.0.3",
+    "prettier": "2.5.1",
+    "eslint": "^8.7.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "@commitlint/cli": "^16.1.0",
+    "@commitlint/config-conventional": "^16.0.0",
+    "@commitlint/cz-commitlint": "^16.1.0",
+    "@commitlint/prompt-cli": "^16.1.0",
+    "commitizen": "^4.2.4",
+    "standard-version": "^9.3.2",
+    "babel-plugin-istanbul": "^6.1.1",
+    "cross-env": "^5.2.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^3.5.3",
+    "nyc": "^15.1.0",
+    "puppeteer": "^5.5.0",
+    "husky": "^7.0.0",
+    "lint-staged": "^12.3.1",
+    "pretty-quick": "^3.1.3"
+  }
 }

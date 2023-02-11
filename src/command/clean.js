@@ -1,5 +1,3 @@
-'use strict';
-
 const Command = require('common-bin');
 const initConfig = require('../config'); // 初始化 config
 const cleaner = require('../lib/cleaner');
