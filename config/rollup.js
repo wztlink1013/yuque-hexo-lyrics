@@ -4,9 +4,8 @@ var pkg = require('../package.json');
 
 var version = pkg.version;
 
-var banner = `
-#!/usr/bin/env node
-/*!
+var banner = `#!/usr/bin/env node
+/*
  * ${pkg.name} ${version}
  * Licensed under MIT
  */
