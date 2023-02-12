@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+'use strict';
+
 const checkForUpdate = require('update-check');
 const chalk = require('chalk');
 const pkg = require('../../package.json');
