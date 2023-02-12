@@ -12,37 +12,12 @@ class SyncCommand extends Command {
 
   async run() {
     for (let i in initConfig) {
-      const initConfig_item = initConfig[i];
-      // for initConfig in config { }
-      if (!initConfig_item) {
-        process.exit(0);
-      }
-      // clear previous directory.
-      if (initConfig_item.lastGeneratePath === '') {
-        out.info('clear previous directory.');
-        cleaner.cleanPosts();
-      }
-      // get articles from yuque or cache
-      // const downloader = new Downloader(initConfig_item);
-      // await downloader.autoUpdate();
-      // out.info('yuque-hexo-lyrics sync done! test local download!');
-    }
-    // TODO: 在这里用for循环对initConfig对象数组进行遍历
-    for (let i in initConfig) {
-      const initConfig_item = initConfig[i];
-      // for initConfig in config { }
-      if (!initConfig_item) {
-        process.exit(0);
-      }
-      // clear previous directory.
-      // if (initConfig_item.lastGeneratePath === '') {
-      //   out.info('clear previous directory.');
-      //   cleaner.cleanPosts();
-      // }
-      // get articles from yuque or cache
-      const downloader = new Downloader(initConfig_item);
+      const repoInfo = initConfig[i];
+      if (!repoInfo) process.exit(0);
+      cleaner.cleanAssignPosts(repoInfo.postPath);
+      const downloader = new Downloader(repoInfo);
       await downloader.autoUpdate();
-      out.info('yuque-hexo-lyrics sync done! test local download!');
+      out.success(`All articles of ${repoInfo.repo} have been downloaded!`);
     }
   }
 }

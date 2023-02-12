@@ -2,7 +2,12 @@ const chalk = require('chalk');
 
 module.exports = {
   info(...args) {
-    const prefix = chalk.green('[INFO]');
+    const prefix = chalk.blue('[INFO]');
+    args.unshift(prefix);
+    console.log.apply(console, args);
+  },
+  success(...args) {
+    const prefix = chalk.green('[SUCCESS]');
     args.unshift(prefix);
     console.log.apply(console, args);
   },

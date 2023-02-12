@@ -4,7 +4,7 @@ const FrontMatter = require('hexo-front-matter');
 const { formatDate, formatRaw } = require('../util');
 
 const entities = new Entities();
-// 背景色区块支持
+// 高亮块
 const colorBlocks = {
   ':::tips\n':
     '<div style="background: #FFFBE6;padding:10px;border: 1px solid #C3C3C3;border-radius:5px;margin-bottom:5px;">',
@@ -61,35 +61,45 @@ function parseMatter(body) {
 /**
  * hexo 文章生产适配器
  *
- * @param {Object} post 文章
+ * @param {Object} 参数
  * @return {String} text
  */
-module.exports = function (post, cates, secret, belong_book) {
+module.exports = function (param) {
+  const { post, tocInfo } = param;
+  const {
+    title,
+    slug: urlname,
+    created_at,
+    word_count,
+    public: articlePublicStatus,
+    book
+  } = post;
+  const cates = tocInfo[urlname] || '';
+  const secret = articlePublicStatus;
+  const belong_book = book.slug;
   // matter 解析
-  const parseRet = parseMatter(post.body); // 格式化body
+  const parseRet = parseMatter(post.body);
   const { body, ...data } = parseRet;
-  // public接口不能用，只能在generatePost函数中用传参的形式放进来
-  // 还有：description updated_at cover
-  const { title, slug: urlname, created_at, word_count } = post;
-  // console.log(title,cover);
 
-  let raw = formatRaw(body); // util工具里面的格式化markdown函数
-  // if(secret === 0) {
-  //   raw = '这是加密文章！'; //如果文章加密了，就不拉取文章内容
-  // }
-  const date = data.date || formatDate(created_at); // util工具里面的处理时间date函数
+  let raw = formatRaw(body);
+  if (secret === 0) {
+    raw = '<div class="yuque-hexo-lyrics-secret">这是加密文章！</div>';
+  }
+  // FIXME: 时间格式化结果受代码运行宿主环境影响
+  const date = data.date || formatDate(created_at);
   const tags = data.tags || [];
   const categories = cates || data.categories || [];
+
   const props = {
-    title: title.replace(/"/g, ''), // 临时去掉标题中的引号，至少保证文章页面是正常可访问的
+    title: title.replace(/"/g, ''), // 临时去掉标题中的引号
     urlname,
     date,
     ...data,
     tags,
     categories,
-    word_count: word_count,
-    secret: secret,
-    belong_book: belong_book
+    word_count,
+    secret,
+    belong_book
   };
   const text = ejs.render(template, {
     raw,

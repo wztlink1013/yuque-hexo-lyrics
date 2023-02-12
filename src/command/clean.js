@@ -1,5 +1,5 @@
 const Command = require('common-bin');
-const initConfig = require('../config'); // 初始化 config
+const initConfig = require('../config');
 const cleaner = require('../lib/cleaner');
 const out = require('../lib/out');
 
@@ -14,9 +14,7 @@ class CleanCommand extends Command {
       process.exit(0);
     }
     cleaner.cleanPosts();
-    cleaner.clearCache();
-    cleaner.clearLastGenerate();
-    out.info('yuque-hexo-lyrics clean done!');
+    out.success('yuque-hexo-lyrics clean done!');
   }
 }
 

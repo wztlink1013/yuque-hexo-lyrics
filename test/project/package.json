@@ -1,14 +1,11 @@
 {
-  "yuqueConfig_essay": {
-    "baseUrl": "https://www.yuque.com/api/v2",
-    "login": "wztlink1013",
-    "repo": "essay",
-    "postPath": "source/essay/",
-    "cachePath": "yuque_essay.json",
-    "mdNameFormat": "slug",
-    "onlyPublished": false,
-    "onlyPublic": false,
-    "adapter": "html",
-    "timeout": "200s"
-  }
+  "yuqueConfig": [
+    {
+      "login": "wztlink1013",
+      "repo": "essay",
+      "postPath": "source/essay/",
+      "mdNameFormat": "title",
+      "adapter": "hexoMarkdown"
+    }
+  ]
 }

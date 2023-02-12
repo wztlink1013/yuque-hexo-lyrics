@@ -30,8 +30,10 @@
 相比原插件增加的功能：
 
 - 支持语雀多个知识库的下载至指定文件夹
-- 支持自动将语雀文档所在的目录写至每篇 `markdown` 文档的 `categories` 字段，Hexo 博客无需手写 `categories` 字段
-- 优化加密文章的优化展示效果、支持字数统计
+- 支持语雀系统上文档的目录至 `hexo` 中的 `categories` 字段
+- 支持加密文章的特殊化处理
+- 支持字数统计
+- 支持 `hexoMarkdown` `hexoHtml` `markdown` 三种 `format` 格式
 
 ## 命令指南
 
@@ -77,55 +79,44 @@ yuque-hexo-lyrics sync
 
 ### package.json
 
-- 插件可同时配置多个知识库下载至本地位置
-- 前缀必须由 `yuqueConfig_` 开头
-
 ```json
 {
   ···
-  "yuqueConfig_dsal": {
-    "baseUrl": "https://www.yuque.com/api/v2",
-    "login": "username_url",
-    "repo": "repo_1",
-    "postPath": "source/repo_1",
-    "cachePath": "yuque_repo_1.json",
-    "mdNameFormat": "slug",
-    "onlyPublished": false,
-    "onlyPublic": true,
-    "adapter": "hexo",
-    "timeout": "100s"
-  },
-  "yuqueConfig_essay": {
-    "baseUrl": "https://www.yuque.com/api/v2",
-    "login": "username_url",
-    "repo": "repo_2",
-    "postPath": "source/repo_2/",
-    "cachePath": "yuque_repo_2.json",
-    "mdNameFormat": "slug",
-    "onlyPublished": false,
-    "onlyPublic": false,
-    "adapter": "html",
-    "timeout": "200s"
-  }
+  "yuqueConfig":[
+    {
+      "login": "wztlink1013",
+      "repo": "qg9o6s",
+      "postPath": "source/qg9o6s/",
+      "mdNameFormat": "slug",
+      "adapter": "hexo"
+    },
+    {
+      "login": "wztlink1013",
+      "repo": "mr43k6",
+      "postPath": "source/mr43k6/",
+      "mdNameFormat": "slug",
+      "adapter": "markdown"
+    }
+  ]
+
 }
 ```
 
-| 参数名           | 含义                                 | 默认值            |
-| ---------------- | ------------------------------------ | ----------------- |
-| baseUrl          | 语雀 API 地址                        | -                 |
-| login            | 语雀 login (group), 也称为个人路径   | -                 |
-| repo             | 语雀仓库短名称，也称为语雀知识库路径 | -                 |
-| postPath         | 文档同步后生成的路径                 | source/repo_1     |
-| cachePath        | 文档下载缓存文件                     | yuque_repo_1.json |
-| mdNameFormat     | 文件名命名方式 (title / slug)        | title             |
-| onlyPublished    | 只展示已经发布的文章                 | false             |
-| onlyPublic       | 只展示公开文章                       | false             |
-| adapter          | 文档生成格式 (hexo/markdown)         | hexo              |
-| timeout          | YuqueClientSDK 超时时间              | 5s                |
-| lastGeneratePath | 上一次同步结束的时间戳               | -                 |
-| concurrency      | 下载文章并发数                       | 5                 |
+| 参数名 | 含义 | 默认值 |
+| --- | --- | --- |
+| baseUrl | 语雀 API 地址 | https://www.yuque.com/api/v2/ |
+| login | 语雀 login (group), 也称为个人路径 | - |
+| repo | 语雀仓库短名称，也称为语雀知识库路径 | - |
+| postPath | 文档同步后生成的路径 | source/yuque |
+| mdNameFormat | 文件名命名方式 (title / slug) | title |
+| onlyPublished | 只展示已经发布的文章 | false |
+| onlyPublic | 只展示公开文章 | false |
+| adapter | 文档生成格式 (hexoMarkdown/hexoHtml/markdown) | hexoMarkdown |
+| timeout | YuqueClientSDK 超时时间 | 200s |
+| concurrency | 下载文章并发数 | 5 |
 
-> slug 是语雀的永久链接名，一般是几个随机字母。
+> - slug 是语雀的永久链接名，一般是几个随机字母。
+> - 去除原插件的本地缓存文件相关配置，因为当知识库文档数过大，本地缓存 json 文件过大。
 
 ## 使用指南
 

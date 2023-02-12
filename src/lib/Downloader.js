@@ -8,11 +8,7 @@ const YuqueClient = require('./yuque');
 const { isPost } = require('../util');
 const out = require('./out');
 
-// 获取当前路径
 const cwd = process.cwd();
-
-// 存放各个slug对应的分类
-const toc_list = {};
 
 // 需要提取的文章属性字段
 const PICK_PROPERTY = [
@@ -33,7 +29,6 @@ const PICK_PROPERTY = [
  *
  * @prop {Object} client 语雀 client
  * @prop {Object} config 知识库配置
- * @prop {String} cachePath 下载的文章缓存的 JSON 文件
  * @prop {String} postBasicPath 下载的文章最终生成 markdown 的目录
  * @prop {Array} _cachedArticles 文章列表
  *
@@ -44,47 +39,53 @@ class Downloader {
     this.client = new YuqueClient(config);
     // 加载配置
     this.config = config;
-    // 缓存json文件
-    this.cachePath = path.join(cwd, config.cachePath);
     // markdown目录
     this.postBasicPath = path.join(cwd, config.postPath);
-    this.lastGeneratePath = config.lastGeneratePath
-      ? path.join(cwd, config.lastGeneratePath)
-      : '';
     // 文章列表
     this._cachedArticles = [];
     this.fetchArticle = this.fetchArticle.bind(this);
     this.generatePost = this.generatePost.bind(this);
-    this.lastGenerate = 0;
+    // 知识库目录
+    this.tocList = {};
     // 超时配置
     this.timeout = config.timeout ? config.timeout : '5s';
-    if (this.lastGeneratePath !== '') {
-      try {
-        this.lastGenerate = Number(
-          fs.readFileSync(this.lastGenerate).toString()
-        );
-      } catch (error) {
-        out.warn(`get last generate time err: ${error}`);
-      }
-    }
+  }
+  /**
+   * 文章下载 => 全量生成 markdown 文章
+   */
+  async autoUpdate() {
+    await this.fetchToc();
+    await this.fetchArticles();
+    this.generatePosts();
   }
 
   /**
-   * 下载文章详情
-   *
-   * @param {Object} item 文章概要
-   * @param {Number} index 所在缓存数组的下标
-   *
-   * @return {Promise} data
+   * 下载知识库目录
    */
-  fetchArticle(item, index) {
-    const { client, _cachedArticles } = this;
-    return function () {
-      out.info(`download article body: ${item.title}`);
-      return client.getArticle(item.slug).then(({ data: article }) => {
-        _cachedArticles[index] = article;
-      });
-    };
+  async fetchToc() {
+    const { client } = this;
+    const toc = await client.getToc();
+    const data = toc.data;
+
+    for (let i = 0; i < data.length; i++) {
+      let item = data[i];
+      if (item.type === 'DOC') {
+        let cates = [];
+        const item_slug = item.slug;
+        if (item.parent_uuid === '') {
+          cates = [];
+        } else {
+          for (let j = i - 1; j >= 0; j--) {
+            if (data[j].depth === item.depth - 1 && data[j].type === 'TITLE') {
+              cates.unshift(data[j].title);
+              item.depth--;
+              continue;
+            }
+          }
+        }
+        this.tocList[item_slug] = cates;
+      }
+    }
   }
 
   /**
@@ -101,8 +102,10 @@ class Downloader {
         `fail to fetch article list, response: ${JSON.stringify(articles)}`
       );
     }
-    out.info(`article amount: ${articles.data.length}`);
-    // 对拉取到的articles的data数组进行筛选
+
+    out.info(
+      `total number of ${config.repo} repo articles: ${articles.data.length}`
+    );
     const realArticles = articles.data
       .filter((article) =>
         config.onlyPublished ? !!article.published_at : true
@@ -143,82 +146,37 @@ class Downloader {
     return new Promise((resolve, reject) => {
       queue.start(function (err) {
         if (err) return reject(err);
-        out.info('download articles done!');
+        out.success('download articles done!');
         resolve();
       });
     });
   }
-
   /**
-   * 下载知识库目录
+   * 下载文章详情
+   *
+   * @param {Object} item 文章概要
+   * @param {Number} index 所在缓存数组的下标
+   *
+   * @return {Promise} data
    */
-  async fetchToc() {
-    const { client } = this;
-    const toc = await client.getToc();
-    out.info(`download toc.`);
-    const data = toc.data;
-    // // 存放各个slug对应的分类
-    // const toc_list = {};
-
-    for (let i = 0; i < data.length; i++) {
-      let item = data[i];
-      // 如果数组元素是文档
-      if (item.type === 'DOC') {
-        let cates = [];
-        const item_slug = item.slug;
-        if (item.parent_uuid === '') {
-          // 没有目录的文档
-          cates = [];
-        } else {
-          // 该文档有其父级
-          // 向前找这篇文档的父级目录
-          // 写一个递归！
-          for (let j = i - 1; j >= 0; j--) {
-            if (data[j].depth === item.depth - 1 && data[j].type === 'TITLE') {
-              cates.unshift(data[j].title);
-              item.depth--;
-              continue;
-            }
-          }
-        }
-        // 将这个对象：cates数组添加到item_info对象里面
-        toc_list[item_slug] = cates;
-        // 将item_info对象添加到数组toc_list里面
-        // toc_list.push(item_info);
-      }
-    }
+  fetchArticle(item, index) {
+    const { client, _cachedArticles } = this;
+    return function () {
+      out.info(`title of downloaded article: ${item.title}`);
+      return client.getArticle(item.slug).then(({ data: article }) => {
+        _cachedArticles[index] = article;
+      });
+    };
   }
-
   /**
-   * 读取语雀的文章缓存 json 文件
+   * 全量生成所有 markdown 文章
    */
-  readYuqueCache() {
-    const { cachePath } = this;
-    out.info(`reading from yuque.json: ${cachePath}`);
-    try {
-      const articles = require(cachePath);
-      if (Array.isArray(articles)) {
-        this._cachedArticles = articles;
-        return;
-      }
-    } catch (error) {
-      out.warn(error.message);
-      // Do noting
-    }
-    this._cachedArticles = [];
+  generatePosts() {
+    const { _cachedArticles, postBasicPath } = this;
+    mkdirp.sync(postBasicPath);
+    out.info(`create repo folder (if it not exists): ${postBasicPath}`);
+    _cachedArticles.forEach(this.generatePost);
   }
-
-  /**
-   * 写入语雀的文章缓存 json 文件
-   */
-  writeYuqueCache() {
-    const { cachePath, _cachedArticles } = this;
-    out.info(`writing to local file: ${cachePath}`);
-    fs.writeFileSync(cachePath, JSON.stringify(_cachedArticles, null, 2), {
-      encoding: 'UTF8'
-    });
-  }
-
   /**
    * 生成一篇 markdown 文章
    *
@@ -230,68 +188,26 @@ class Downloader {
       return;
     }
 
-    if (new Date(post.published_at).getTime() < this.lastGenerate) {
-      out.info(`post not updated skip: ${post.title}`);
-      return;
-    }
-
     const { postBasicPath } = this;
     const { mdNameFormat, adapter } = this.config;
     const fileName = filenamify(post[mdNameFormat]);
     const postPath = path.join(postBasicPath, `${fileName}.md`);
-    let transform; //引入hexo.js文件执行变量
-    let cates; //目录数组参数
-    let secret; // 文章是否加密参数
-    let belong_book; //文章属于哪个知识库（slug）
+    let transform;
+
     try {
-      // 引入了hexo.js文件
       transform = require(path.join(__dirname, '../adapter', adapter));
-      // console.log(toc_list);
-      // console.log(post.book.slug);
-      // console.log(post.public);
-      // 写一串代码，生成一个参数，放
-      secret = post.public;
-      belong_book = post.book.slug;
-      const search_slug = post.slug;
-      if (toc_list[search_slug]) {
-        cates = toc_list[search_slug];
-      } else {
-        cates = '';
-      }
-      // console.log(cates);
     } catch (error) {
       out.error(`adpater (${adapter}) is invalid.`);
       process.exit(-1);
     }
     out.info(`generate post file: ${postPath}`);
-    const text = transform(post, cates, secret, belong_book);
-    fs.writeFileSync(postPath, text, {
+    const mdContent = transform({
+      post,
+      tocInfo: this.tocList
+    });
+    fs.writeFileSync(postPath, mdContent, {
       encoding: 'UTF8'
     });
-  }
-
-  /**
-   * 全量生成所有 markdown 文章
-   */
-  generatePosts() {
-    const { _cachedArticles, postBasicPath } = this;
-    mkdirp.sync(postBasicPath);
-    out.info(`create posts directory (if it not exists): ${postBasicPath}`);
-    _cachedArticles.forEach(this.generatePost);
-  }
-
-  // 文章下载 => 增量更新文章到缓存 json 文件 => 全量生成 markdown 文章
-  async autoUpdate() {
-    this.readYuqueCache();
-    // 下载知识库目录
-    await this.fetchToc();
-    await this.fetchArticles();
-    // 调试中，不需要下面的写入缓存
-    // this.writeYuqueCache();
-    this.generatePosts();
-    if (this.lastGeneratePath) {
-      fs.writeFileSync(this.lastGeneratePath, new Date().getTime());
-    }
   }
 }
 

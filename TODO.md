@@ -9,3 +9,4 @@
 - [ ] https://github.com/wztlink1013/yuque-hexo-lyrics/issues/8
 - [ ] https://github.com/wztlink1013/yuque-hexo-lyrics/issues/9
 - [ ] 一个完整的 hexo 项目示例 demo
+- [ ] format 增加 html
