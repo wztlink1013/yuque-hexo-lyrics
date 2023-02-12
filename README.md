@@ -32,7 +32,7 @@
 - 支持语雀多个知识库的下载至指定文件夹
 - 支持语雀系统上文档的目录至 `hexo` 中的 `categories` 字段
 - 支持加密文章的特殊化处理
-- 支持字数统计
+- 支持自定义`front-matter`：`urlname`、`word_count`、`secret`、`belong_book` 等
 - 支持 `hexoMarkdown` `hexoHtml` `markdown` 三种 `format` 格式
 
 ## 命令指南
@@ -45,23 +45,14 @@ npm i -g yuque-hexo-lyrics
 
 ### Clean
 
-```
+```bash
 yuque-hexo-lyrics clean
 ```
 
 ### Sync
 
-```
+```bash
 yuque-hexo-lyrics sync
-```
-
-### Scripts
-
-```json
-{
-  "sync": "yuque-hexo-lyrics sync",
-  "clean:yuque": "yuque-hexo-lyrics clean"
-}
 ```
 
 ## 配置指南
@@ -73,8 +64,8 @@ yuque-hexo-lyrics sync
 - 语雀 Token 获取方式：https://www.yuque.com/settings/tokens
 - 设置全局的环境变量 YUQUE_TOKEN
   - 方式一：命令执行时传入环境变量
-    - mac / linux: `YUQUE_TOKEN=xxx yuque-hexo sync`
-    - windows: `set YUQUE_TOKEN=xxx && yuque-hexo sync`
+    - mac / linux: `YUQUE_TOKEN=xxx yuque-hexo-lyrics sync`
+    - windows: `set YUQUE_TOKEN=xxx && yuque-hexo-lyrics sync`
   - 方式二：直接在系统环境变量中设置
 
 ### package.json
@@ -88,13 +79,13 @@ yuque-hexo-lyrics sync
       "repo": "qg9o6s",
       "postPath": "source/qg9o6s/",
       "mdNameFormat": "slug",
-      "adapter": "hexo"
+      "adapter": "hexoMarkdown"
     },
     {
       "login": "wztlink1013",
       "repo": "mr43k6",
       "postPath": "source/mr43k6/",
-      "mdNameFormat": "slug",
+      "mdNameFormat": "title",
       "adapter": "markdown"
     }
   ]
@@ -112,24 +103,17 @@ yuque-hexo-lyrics sync
 | onlyPublished | 只展示已经发布的文章 | false |
 | onlyPublic | 只展示公开文章 | false |
 | adapter | 文档生成格式 (hexoMarkdown/hexoHtml/markdown) | hexoMarkdown |
-| timeout | YuqueClientSDK 超时时间 | 200s |
+| timeout | 超时时间 | 200s |
 | concurrency | 下载文章并发数 | 5 |
 
-> - slug 是语雀的永久链接名，一般是几个随机字母。
-> - 去除原插件的本地缓存文件相关配置，因为当知识库文档数过大，本地缓存 json 文件过大。
+> - slug 是语雀的永久链接名，是几个随机字母和数字的混合字符串。
+> - **去除原插件的本地缓存文件相关配置，因为当知识库文档数过大，本地缓存 json 文件过大。**
 
 ## 使用指南
 
-### 从语雀所拉取的文章
-
-语雀同步过来的文章会生成两部分文件；
-
-- yuque_repo_1.json: 从语雀 API 拉取的数据，供缓存使用(不建议使用，影响 git 仓库大小)
-- source/\_posts/repo_1/\*.md: 语雀知识库文章对应生成的 `markdown` 文件
-
 ### front-matter 配置
 
-- 支持配置 `hexo` 博客系统的 `front-matter`, 语雀编辑器编写示例如下:
+- 支持配置 `Hexo` 博客系统的 `front-matter`，语雀编辑器编写示例如下:
 - 语雀编辑器内容示例
 
 ```
@@ -145,7 +129,7 @@ article description
 article detail
 ```
 
-### 图片无法加载
+### 语雀图片存在防盗链问题
 
 [https://github.com/wztlink1013/yuque-hexo-lyrics/discussions/10](https://github.com/wztlink1013/yuque-hexo-lyrics/discussions/10)
 
