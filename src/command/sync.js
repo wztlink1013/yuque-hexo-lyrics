@@ -1,6 +1,6 @@
 const Command = require('common-bin');
 const initConfig = require('../config');
-const cleaner = require('../lib/cleaner');
+// const cleaner = require('../lib/cleaner');
 const Downloader = require('../lib/Downloader');
 const out = require('../lib/out');
 
@@ -11,13 +11,14 @@ class SyncCommand extends Command {
   }
 
   async run() {
-    for (let i in initConfig) {
-      const repoInfo = initConfig[i];
-      if (!repoInfo) process.exit(0);
-      cleaner.cleanAssignPosts(repoInfo.postPath);
-      const downloader = new Downloader(repoInfo);
+    const { repos, cache } = initConfig;
+    for (let i in repos) {
+      const repoConfig = repos[i];
+      if (!repoConfig) process.exit(0);
+      // cleaner.cleanAssignPosts(repoConfig.postPath);
+      const downloader = new Downloader(repoConfig, cache);
       await downloader.autoUpdate();
-      out.success(`All articles of ${repoInfo.repo} have been downloaded!`);
+      out.success(`All articles of ${repoConfig.repo} have been downloaded!`);
     }
   }
 }

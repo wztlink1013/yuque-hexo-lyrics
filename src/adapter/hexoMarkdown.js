@@ -70,6 +70,7 @@ module.exports = function (param) {
     title,
     slug: urlname,
     created_at,
+    updated_at,
     word_count,
     public: articlePublicStatus,
     book
@@ -87,6 +88,7 @@ module.exports = function (param) {
   }
   // FIXME: 时间格式化结果受代码运行宿主环境影响
   const date = data.date || formatDate(created_at);
+  const updated = data.updated || formatDate(updated_at);
   const tags = data.tags || [];
   const categories = cates || data.categories || [];
 
@@ -94,6 +96,7 @@ module.exports = function (param) {
     title: title.replace(/"/g, ''), // 临时去掉标题中的引号
     urlname,
     date,
+    updated,
     ...data,
     tags,
     categories,

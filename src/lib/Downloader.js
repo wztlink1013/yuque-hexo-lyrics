@@ -5,7 +5,7 @@ const lodash = require('lodash');
 const Queue = require('queue');
 const filenamify = require('filenamify');
 const YuqueClient = require('./yuque');
-const { isPost } = require('../util');
+const { isPost, formatDate } = require('../util');
 const out = require('./out');
 
 const cwd = process.cwd();
@@ -28,37 +28,50 @@ const PICK_PROPERTY = [
  * Constructor 下载器
  *
  * @prop {Object} client 语雀 client
- * @prop {Object} config 知识库配置
+ * @prop {Object} repoConfig 知识库配置
  * @prop {String} postBasicPath 下载的文章最终生成 markdown 的目录
- * @prop {Array} _cachedArticles 文章列表
+ * @prop {Array} cachedArticles 文章列表
  *
  */
 class Downloader {
-  constructor(config) {
+  constructor(repoConfig, cacheConfig) {
     // 语雀client
-    this.client = new YuqueClient(config);
+    this.client = new YuqueClient(repoConfig);
     // 加载配置
-    this.config = config;
-    // markdown目录
-    this.postBasicPath = path.join(cwd, config.postPath);
+    this.repoConfig = repoConfig;
+    // 缓存文件目录
+    this.cacheFilePath = path.join(cwd, `${cacheConfig.path}.json`);
+    this.cacheContent = '';
+    // 知识库目录
+    this.postBasicPath = path.join(cwd, repoConfig.postPath);
     // 文章列表
-    this._cachedArticles = [];
+    this.cachedArticles = [];
     this.fetchArticle = this.fetchArticle.bind(this);
     this.generatePost = this.generatePost.bind(this);
     // 知识库目录
     this.tocList = {};
     // 超时配置
-    this.timeout = config.timeout ? config.timeout : '5s';
+    this.timeout = repoConfig.timeout ? repoConfig.timeout : '5s';
+    // 缓存文件
+    this.cacheObj = {};
   }
   /**
    * 文章下载 => 全量生成 markdown 文章
    */
   async autoUpdate() {
+    await this.readCache();
     await this.fetchToc();
     await this.fetchArticles();
     this.generatePosts();
   }
-
+  async readCache() {
+    try {
+      this.cacheContent = fs.readFileSync(this.cacheFilePath).toString();
+    } catch (error) {
+      out.warn('no cache file!');
+      this.cacheContent = '{}';
+    }
+  }
   /**
    * 下载知识库目录
    */
@@ -95,25 +108,40 @@ class Downloader {
    * @return {Promise} queue
    */
   async fetchArticles() {
-    const { client, config, _cachedArticles } = this;
+    const { client, repoConfig, cachedArticles } = this;
     const articles = await client.getArticles();
+
     if (!Array.isArray(articles.data)) {
       throw new Error(
         `fail to fetch article list, response: ${JSON.stringify(articles)}`
       );
     }
+    let realArticles = articles.data
+      .filter((article) =>
+        repoConfig.onlyPublished ? !!article.published_at : true
+      )
+      .filter((article) => (repoConfig.onlyPublic ? !!article.public : true))
+      .map((article) => {
+        this.generateCacheContent(article);
+        return lodash.pick(article, PICK_PROPERTY);
+      });
+
+    const asyncFilter = async (arr, predicate) => {
+      const results = await Promise.all(arr.map(predicate));
+
+      return arr.filter((_v, index) => results[index]);
+    };
+    realArticles = await asyncFilter(realArticles, async (article) => {
+      return this.checkCacheArticle(article);
+    });
 
     out.info(
-      `total number of ${config.repo} repo articles: ${articles.data.length}`
+      `total number of ${repoConfig.repo} repo articles: ${
+        articles.data.length
+      }, hit cache articles: ${articles.data.length - realArticles.length}`
     );
-    const realArticles = articles.data
-      .filter((article) =>
-        config.onlyPublished ? !!article.published_at : true
-      )
-      .filter((article) => (config.onlyPublic ? !!article.public : true))
-      .map((article) => lodash.pick(article, PICK_PROPERTY));
-
-    const queue = new Queue({ concurrency: config.concurrency });
+    this.generateCacheFile(this.cacheObj);
+    const queue = new Queue({ concurrency: repoConfig.concurrency });
 
     let article;
     let cacheIndex;
@@ -126,14 +154,14 @@ class Downloader {
 
     for (let i = 0; i < realArticles.length; i++) {
       article = realArticles[i];
-      cacheIndex = _cachedArticles.findIndex(findIndexFn);
+      cacheIndex = cachedArticles.findIndex(findIndexFn);
       if (cacheIndex < 0) {
         // 未命中缓存，新增一条
-        cacheIndex = _cachedArticles.length;
-        _cachedArticles.push(article);
+        cacheIndex = cachedArticles.length;
+        cachedArticles.push(article);
         queue.push(this.fetchArticle(article, cacheIndex));
       } else {
-        cacheArticle = _cachedArticles[cacheIndex];
+        cacheArticle = cachedArticles[cacheIndex];
         cacheAvaliable =
           +new Date(article.updated_at) === +new Date(cacheArticle.updated_at);
         // 文章有变更，更新缓存
@@ -152,6 +180,45 @@ class Downloader {
     });
   }
   /**
+   * 缓存规则
+   * @param {Object} article
+   * @returns 根据缓存规则判断是否需要下载当前文章
+   */
+  async checkCacheArticle(article) {
+    if (this.cacheContent === '{}') return true;
+    const { repoConfig } = this;
+    const { slug, title, updated_at } = article;
+    const updated = formatDate(updated_at);
+    const currentArticle = JSON.parse(this.cacheContent)[repoConfig.repo][slug];
+    const fileExist = await this.checkPostExist(article);
+    // 命中缓存：标题 更新时间 存在该文件
+    return currentArticle.title === title &&
+      currentArticle.updated === updated &&
+      fileExist
+      ? false
+      : true;
+  }
+  async checkPostExist(article) {
+    const { repoConfig } = this;
+    const { slug, title } = article;
+    const filePath = path.join(
+      cwd,
+      `${repoConfig.postPath}${
+        repoConfig.mdNameFormat === 'title' ? title : slug
+      }.md`
+    );
+    try {
+      if (fs.existsSync(filePath)) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      out.error('cache exist, but file not exist');
+      return false;
+    }
+  }
+  /**
    * 下载文章详情
    *
    * @param {Object} item 文章概要
@@ -160,11 +227,11 @@ class Downloader {
    * @return {Promise} data
    */
   fetchArticle(item, index) {
-    const { client, _cachedArticles } = this;
+    const { client, cachedArticles } = this;
     return function () {
       out.info(`title of downloaded article: ${item.title}`);
       return client.getArticle(item.slug).then(({ data: article }) => {
-        _cachedArticles[index] = article;
+        cachedArticles[index] = article;
       });
     };
   }
@@ -172,10 +239,10 @@ class Downloader {
    * 全量生成所有 markdown 文章
    */
   generatePosts() {
-    const { _cachedArticles, postBasicPath } = this;
+    const { cachedArticles, postBasicPath } = this;
     mkdirp.sync(postBasicPath);
     out.info(`create repo folder (if it not exists): ${postBasicPath}`);
-    _cachedArticles.forEach(this.generatePost);
+    cachedArticles.forEach(this.generatePost);
   }
   /**
    * 生成一篇 markdown 文章
@@ -189,7 +256,7 @@ class Downloader {
     }
 
     const { postBasicPath } = this;
-    const { mdNameFormat, adapter } = this.config;
+    const { mdNameFormat, adapter } = this.repoConfig;
     const fileName = filenamify(post[mdNameFormat]);
     const postPath = path.join(postBasicPath, `${fileName}.md`);
     let transform;
@@ -206,6 +273,38 @@ class Downloader {
       tocInfo: this.tocList
     });
     fs.writeFileSync(postPath, mdContent, {
+      encoding: 'UTF8'
+    });
+  }
+  /**
+   * 生成缓存文件内容
+   * @param {Object} article 文章基本信息
+   */
+  generateCacheContent(article) {
+    const { repoConfig } = this;
+    const { slug, title, updated_at } = article;
+
+    if (this.cacheObj[repoConfig.repo]) {
+      this.cacheObj[repoConfig.repo][slug] = {
+        title: title,
+        updated: formatDate(updated_at)
+      };
+    } else {
+      this.cacheObj[repoConfig.repo] = {
+        [slug]: {
+          title: title,
+          updated: formatDate(updated_at)
+        }
+      };
+    }
+  }
+  /**
+   * 生成缓存文件
+   * @param {Object} content 缓存文件内容
+   */
+  generateCacheFile(content) {
+    const { cacheFilePath } = this;
+    fs.writeFileSync(cacheFilePath, JSON.stringify(content), {
       encoding: 'UTF8'
     });
   }

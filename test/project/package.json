@@ -1,11 +1,16 @@
 {
-  "yuqueConfig": [
-    {
-      "login": "wztlink1013",
-      "repo": "essay",
-      "postPath": "source/essay/",
-      "mdNameFormat": "title",
-      "adapter": "hexoMarkdown"
-    }
-  ]
+  "yuqueConfig": {
+    "cache": {
+      "path": "yuque-hexo-lyrics"
+    },
+    "repos": [
+      {
+        "login": "wztlink1013",
+        "repo": "website",
+        "postPath": "source/website/",
+        "mdNameFormat": "title",
+        "adapter": "hexoMarkdown"
+      }
+    ]
+  }
 }

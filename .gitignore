@@ -7,3 +7,4 @@ dist
 .nyc_output
 .eslintcache
 test/project/source
+test/project/yuque-hexo-lyrics.json

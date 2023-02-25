@@ -1,5 +1,7 @@
 dist
 coverage
 .nyc_output
+CHANGELOG.md
 package-lock.json
 test/project/source
+test/project/yuque-hexo-lyrics.json

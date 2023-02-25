@@ -26,12 +26,13 @@ function loadConfig() {
     return null;
   }
 
-  let result = [];
-  let yuqueConfig = pkg.yuqueConfig || [];
+  let resultRepos = [];
+  let yuqueConfig = pkg.yuqueConfig.repos || [];
   yuqueConfig.forEach((item) => {
-    result.push(Object.assign({}, defaultConfig, item));
+    resultRepos.push(Object.assign({}, defaultConfig, item));
   });
-  return result;
+  pkg.yuqueConfig.repos = resultRepos;
+  return pkg.yuqueConfig;
 }
 
 function loadJson() {
