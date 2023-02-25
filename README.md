@@ -9,17 +9,16 @@
 - [目录](#目录)
 - [特性](#特性)
 - [命令指南](#命令指南)
-  - [Install](#Install)
-  - [Clean](#Clean)
-  - [Sync](#Sync)
-  - [Scripts](#Scripts)
+  - [Install](#install)
+  - [Clean](#clean)
+  - [Sync](#sync)
 - [配置指南](#配置指南)
-  - [TOKEN](#TOKEN)
-  - [package.json](#package.json)
+  - [TOKEN](#token)
+  - [package.json](#package)
 - [使用指南](#使用指南)
-  - [从语雀所拉取的文章](#从语雀所拉取的文章)
   - [front-matter 配置](#front-matter配置)
-  - [图片无法加载](#图片无法加载)
+  - [语雀图片存在防盗链问题](#语雀图片存在防盗链问题)
+  - [缓存逻辑](#缓存逻辑)
 - [贡献者列表](#贡献者列表)
 - [更新日志](#更新日志)
 - [计划列表](#计划列表)
@@ -30,10 +29,14 @@
 相比原插件增加的功能：
 
 - 支持语雀多个知识库的下载至指定文件夹
-- 支持语雀系统上文档的目录至 `hexo` 中的 `categories` 字段
 - 支持加密文章的特殊化处理
-- 支持自定义`front-matter`：`urlname`、`word_count`、`secret`、`belong_book` 等
-- 支持 `hexoMarkdown` `hexoHtml` `markdown` 三种 `format` 格式
+- 无需对语雀文档添加 `front-matter` 字段，常用字段自动拉取
+  - 基本字段：`title`、`date`、`updated`
+  - 根据语雀系统自动拉取：`urlname`、`word_count`、`secret`、`belong_book`
+  - 支持语雀系统上文档的目录至 `hexo` 中的 `categories` 字段
+  - 自定义（eg：`tags` 语雀文档暂无相关标签字段接口）
+- 支持 `hexoMarkdown`、`hexoHtml`、`markdown` 三种 `format` 格式
+- 支持缓存配置
 
 ## 命令指南
 
@@ -68,58 +71,57 @@ yuque-hexo-lyrics sync
     - windows: `set YUQUE_TOKEN=xxx && yuque-hexo-lyrics sync`
   - 方式二：直接在系统环境变量中设置
 
-### package.json
+### package
+
+`package.json`
 
 ```json
 {
   ···
-  "yuqueConfig":[
-    {
-      "login": "wztlink1013",
-      "repo": "qg9o6s",
-      "postPath": "source/qg9o6s/",
-      "mdNameFormat": "slug",
-      "adapter": "hexoMarkdown"
+  "yuqueConfig": {
+    "cache": {
+      "path": "yuque-hexo-lyrics"
     },
-    {
-      "login": "wztlink1013",
-      "repo": "mr43k6",
-      "postPath": "source/mr43k6/",
-      "mdNameFormat": "title",
-      "adapter": "markdown"
-    }
-  ]
-
+    "repos": [
+      {
+        "login": "wztlink1013",
+        "repo": "website",
+        "postPath": "source/website/",
+        "mdNameFormat": "title",
+        "adapter": "hexoMarkdown"
+      },
+      ···
+    ]
+  }
 }
 ```
 
-| 参数名 | 含义 | 默认值 |
-| --- | --- | --- |
-| baseUrl | 语雀 API 地址 | https://www.yuque.com/api/v2/ |
-| login | 语雀 login (group), 也称为个人路径 | - |
-| repo | 语雀仓库短名称，也称为语雀知识库路径 | - |
-| postPath | 文档同步后生成的路径 | source/yuque |
-| mdNameFormat | 文件名命名方式 (title / slug) | title |
-| onlyPublished | 只展示已经发布的文章 | false |
-| onlyPublic | 只展示公开文章 | false |
-| adapter | 文档生成格式 (hexoMarkdown/hexoHtml/markdown) | hexoMarkdown |
-| timeout | 超时时间 | 200s |
-| concurrency | 下载文章并发数 | 5 |
+|  | 字段 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| cache | path | yuque-hexo-lyrics | 缓存文件名 |
+| repos | baseUrl | https://www.yuque.com/api/v2/ | 语雀 API 地址 |
+|  | login | - | 语雀 login (group), 也称为个人路径 |
+|  | repo | - | 语雀仓库短名称，也称为语雀知识库路径 |
+|  | postPath | source/yuque | 文档同步后生成的路径 |
+|  | mdNameFormat | title | 文件名命名方式 (title / slug) |
+|  | onlyPublished | false | 只展示已经发布的文章 |
+|  | onlyPublic | false | 只展示公开文章 |
+|  | adapter | hexoMarkdown | 文档生成格式 (hexoMarkdown/hexoHtml/markdown) |
+|  | timeout | 200s | 超时时间 |
+|  | concurrency | 5 | 下载文章并发数 |
 
-> - slug 是语雀的永久链接名，是几个随机字母和数字的混合字符串。
-> - **去除原插件的本地缓存文件相关配置，因为当知识库文档数过大，本地缓存 json 文件过大。**
+> slug 是语雀的永久链接名，是几个随机字母和数字的混合字符串。
 
 ## 使用指南
 
 ### front-matter 配置
 
-- 支持配置 `Hexo` 博客系统的 `front-matter`，语雀编辑器编写示例如下:
-- 语雀编辑器内容示例
+- 插件会自动拉取[大多数 Hexo 字段](#特性)，使得在语雀中写文章不用每次在头部都需要手动写 `front-matter`，以下字段后续还会扩充
+- 除去大多数上述字段，有少部分字段目前难以适配，比如`tags`和`Hexo`大多数主题自定义`front-matter`，语雀系统暂未开放文档的标签相关字段，所以写文章特别注重标签的用户只能以下面方式来添加 `front-matter`:
 
 ```
 ---
 tags: [hexo, blog]
-categories: [nodejs]
 ---
 
 article description
@@ -133,6 +135,10 @@ article detail
 
 [https://github.com/wztlink1013/yuque-hexo-lyrics/discussions/10](https://github.com/wztlink1013/yuque-hexo-lyrics/discussions/10)
 
+### 缓存逻辑
+
+去除原插件的本地缓存文件相关配置，因为当知识库文档数过大，本地缓存 json 文件过大。故改用新一种缓存策略，通过对文件判断更新日期、标题、本地存在与否在进行是否重新下载操作
+
 ## 贡献者列表
 
 [contributors](https://github.com/wztlink1013/yuque-hexo-lyrics/graphs/contributors)
@@ -143,7 +149,7 @@ article detail
 
 ## 计划列表
 
-[TODO.md](./TODO.md)
+[https://github.com/wztlink1013/yuque-hexo-lyrics/projects/1](https://github.com/wztlink1013/yuque-hexo-lyrics/projects/1)
 
 ## 相关链接
 

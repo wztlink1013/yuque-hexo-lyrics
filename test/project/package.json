@@ -6,8 +6,8 @@
     "repos": [
       {
         "login": "wztlink1013",
-        "repo": "website",
-        "postPath": "source/website/",
+        "repo": "essay",
+        "postPath": "source/essay/",
         "mdNameFormat": "title",
         "adapter": "hexoMarkdown"
       }
