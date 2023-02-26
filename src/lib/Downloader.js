@@ -12,16 +12,16 @@ const cwd = process.cwd();
 
 // 需要提取的文章属性字段
 const PICK_PROPERTY = [
-  'title', // 标题
-  'description', // 描述
-  'created_at', // 文档创建日期
-  'updated_at', // 文档更新日期
-  'published_at', //文档发布日期
-  'format', // 什么格式
-  'slug', // slug
-  'last_editor', //
-  'public', //公开与否，不过hexo.js文件不能用，因为这里已经被处理了
-  'word_count' //字数统计
+  'title',
+  'description',
+  'created_at',
+  'updated_at',
+  'published_at',
+  'format',
+  'slug',
+  'last_editor',
+  'public',
+  'word_count'
 ];
 
 /**
@@ -140,7 +140,7 @@ class Downloader {
         articles.data.length
       }, hit cache articles: ${articles.data.length - realArticles.length}`
     );
-    this.generateCacheFile(this.cacheObj);
+    if (!realArticles.length) return;
     const queue = new Queue({ concurrency: repoConfig.concurrency });
 
     let article;
@@ -240,6 +240,7 @@ class Downloader {
    */
   generatePosts() {
     const { cachedArticles, postBasicPath } = this;
+    if (!cachedArticles.length) return;
     mkdirp.sync(postBasicPath);
     out.info(`create repo folder (if it not exists): ${postBasicPath}`);
     cachedArticles.forEach(this.generatePost);
@@ -297,16 +298,6 @@ class Downloader {
         }
       };
     }
-  }
-  /**
-   * 生成缓存文件
-   * @param {Object} content 缓存文件内容
-   */
-  generateCacheFile(content) {
-    const { cacheFilePath } = this;
-    fs.writeFileSync(cacheFilePath, JSON.stringify(content), {
-      encoding: 'UTF8'
-    });
   }
 }
 

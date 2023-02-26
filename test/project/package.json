@@ -8,7 +8,14 @@
         "login": "wztlink1013",
         "repo": "essay",
         "postPath": "source/essay/",
-        "mdNameFormat": "title",
+        "mdNameFormat": "slug",
+        "adapter": "hexoMarkdown"
+      },
+      {
+        "login": "wztlink1013",
+        "repo": "website",
+        "postPath": "source/website/",
+        "mdNameFormat": "slug",
         "adapter": "hexoMarkdown"
       }
     ]
