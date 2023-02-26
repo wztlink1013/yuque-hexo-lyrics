@@ -27,8 +27,9 @@ function loadConfig() {
     out.error('current directory should have a package.json');
     return null;
   }
-  const cache = Object.assign({}, defaultCacheConfig, pkg.yuqueConfig.cache);
-  const repos = (pkg.yuqueConfig.repos || []).map((item) =>
+  const { yuqueConfig } = pkg;
+  const cache = Object.assign({}, defaultCacheConfig, yuqueConfig?.cache);
+  const repos = (yuqueConfig?.repos || []).map((item) =>
     Object.assign({}, defaultRepoConfig, item)
   );
   return {
