@@ -28,6 +28,11 @@
     "test:puppeteer": "node test/browser/puppeteer.js",
     "prepare": "husky install"
   },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  },
   "bugs": {
     "url": "https://github.com/wztlink1013/yuque-hexo-lyrics/issues"
   },
