@@ -7,7 +7,7 @@ module.exports = {
   singleQuote: true,
   quoteProps: 'as-needed',
   bracketSpacing: true,
-  trailingComma: 'none', // 尾部统一不加逗号
+  trailingComma: 'none',
   arrowParens: 'always',
   insertPragma: false,
   requirePragma: false,

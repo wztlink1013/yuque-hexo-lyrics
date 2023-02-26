@@ -15,7 +15,7 @@ module.exports = {
     'prettier/prettier': [
       'error',
       {
-        trailingComma: 'none' // 统一尾部不加逗号
+        trailingComma: 'none'
       }
     ]
   }

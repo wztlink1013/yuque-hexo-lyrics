@@ -52,25 +52,10 @@ module.exports = {
   scopes: [
     { name: 'config' },
     { name: 'docx' },
-    { name: 'commit' },
+    { name: 'all' },
+    { name: 'framwork' },
     { name: 'publish' }
   ],
-  usePreparedCommit: false, // to re-use commit from ./.git/COMMIT_EDITMSG
-  allowTicketNumber: false,
-  isTicketNumberRequired: false,
-  ticketNumberPrefix: 'TICKET-',
-  ticketNumberRegExp: '\\d{1,5}',
-  // it needs to match the value for field type. Eg.: 'fix'
-  /*
-  scopeOverrides: {
-    fix: [
-      {name: 'merge'},
-      {name: 'style'},
-      {name: 'e2eTest'},
-      {name: 'unitTest'}
-    ]
-  },
-  */
   messages: {
     type: '请选择提交类型(必填)',
     scope: '请输入文件修改范围(可选)',
@@ -83,8 +68,5 @@ module.exports = {
   },
   allowCustomScopes: true,
   allowBreakingChanges: ['feat', 'fix'],
-  // 跳过问题
-  skipQuestions: ['body', 'breaking'],
-  footerPrefix: 'ISSUES CLOSED:',
   subjectLimit: 72
 };

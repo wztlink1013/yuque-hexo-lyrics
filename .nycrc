@@ -6,6 +6,6 @@
   "branches": 75,
   "require": ["@babel/register"],
   "reporter": ["html", "text"],
-  "sourceMap": false,
+  "sourceMap": true,
   "instrument": false
 }

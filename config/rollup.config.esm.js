@@ -1,5 +1,5 @@
 // rollup.config.js
-// ES output
+// ES moudle
 var common = require('./rollup.js');
 
 module.exports = {
