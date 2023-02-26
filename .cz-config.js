@@ -6,7 +6,7 @@ module.exports = {
     },
     {
       value: ':bug: fix',
-      name: '🐞 fix:      修复bug'
+      name: '🐛 fix:      修复bug'
     },
     {
       value: ':package: build',
