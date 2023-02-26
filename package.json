@@ -23,7 +23,8 @@
     "build:esm": "rollup -c config/rollup.config.esm.js",
     "build:aio": "rollup -c config/rollup.config.aio.js",
     "build": "npm run build:self && npm run build:esm && npm run build:aio",
-    "commit": "git add . && git-cz",
+    "cz": "npx ./node_modules/cz-customizable/standalone.js",
+    "commit": "git add . && npm run cz",
     "changelog": "conventional-changelog -p cz-config.js -i CHANGELOG.md -s",
     "test:puppeteer": "node test/browser/puppeteer.js",
     "prepare": "husky install"
@@ -71,6 +72,7 @@
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/register": "^7.0.0",
+    "@commitlint/cli": "^17.4.4",
     "@jslib-book/cli": "^1.0.0",
     "babel-plugin-istanbul": "^6.1.1",
     "commitizen": "^4.3.0",

@@ -49,9 +49,32 @@ module.exports = {
       name: '👷 ci:       CI related changes'
     }
   ],
+  scopes: [
+    { name: 'config' },
+    { name: 'docx' },
+    { name: 'commit' },
+    { name: 'publish' }
+  ],
+  usePreparedCommit: false, // to re-use commit from ./.git/COMMIT_EDITMSG
+  allowTicketNumber: false,
+  isTicketNumberRequired: false,
+  ticketNumberPrefix: 'TICKET-',
+  ticketNumberRegExp: '\\d{1,5}',
+  // it needs to match the value for field type. Eg.: 'fix'
+  /*
+  scopeOverrides: {
+    fix: [
+      {name: 'merge'},
+      {name: 'style'},
+      {name: 'e2eTest'},
+      {name: 'unitTest'}
+    ]
+  },
+  */
   messages: {
     type: '请选择提交类型(必填)',
-    customScope: '请输入文件修改范围(可选)',
+    scope: '请输入文件修改范围(可选)',
+    customScope: '请输入自定义scope类型',
     subject: '请简要描述提交(必填)',
     body: '请输入详细描述(可选)',
     breaking: '列出任何BREAKING CHANGES(可选)',
@@ -59,7 +82,9 @@ module.exports = {
     confirmCommit: '确定提交此说明吗？'
   },
   allowCustomScopes: true,
+  allowBreakingChanges: ['feat', 'fix'],
   // 跳过问题
-  skipQuestions: ['body'],
+  skipQuestions: ['body', 'breaking'],
+  footerPrefix: 'ISSUES CLOSED:',
   subjectLimit: 72
 };
