@@ -38,26 +38,12 @@ function parseMatter(body) {
   }
 }
 const tranPreFun = (str) => {
-  // 匹配所有pre标签（开闭）
-  let patt = /<pre data-language="(([\s\S])*?)<\/pre>/g;
-  // 开pre
-  let patt_replace = /<.*?>/;
-  // 获取语言类型
-  let patt_lang = /data-language=".*?"/;
-
-  let result = str.replace(patt, (data) => {
-    let tran_last = data.slice(0, -6) + '\n' + '```' + '\n\n';
-    let tran_head = tran_last.replace(patt_replace, (_pre) => {
-      let _temp =
-        '\n\n' +
-        '```' +
-        _pre.match(patt_lang)[0].replace('data-language="', '').slice(0, -1) +
-        '\n';
-      return _temp;
-    });
-    return tran_head;
+  return str.replace(/<pre data-language="(([\s\S])*?)<\/pre>/g, (data) => {
+    return `${data.slice(0, -6)}\n</code></pre>\n`.replace(
+      /<.*?>/,
+      () => `\n<pre><code>`
+    );
   });
-  return result;
 };
 /**
  * hexoHtml 文章生产适配器
