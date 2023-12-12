@@ -1,6 +1,6 @@
 {
   "name": "yuque-hexo-lyrics",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "A downloader for articles from yuque",
   "author": "wztlink1013",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "build:esm": "rollup -c config/rollup.config.esm.js",
     "build:aio": "rollup -c config/rollup.config.aio.js",
     "build": "npm run build:self && npm run build:esm && npm run build:aio",
-    "cz": "npx ./node_modules/cz-customizable/standalone.js",
+    "cz": "npx ./node_modules/cz-customizable",
     "commit": "git add . && npm run cz",
     "changelog": "conventional-changelog -p cz-config.js -i CHANGELOG.md -s",
     "test:puppeteer": "node test/browser/puppeteer.js",
