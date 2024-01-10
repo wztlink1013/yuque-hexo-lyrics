@@ -111,12 +111,9 @@ class Downloader {
     const { client, repoConfig, cachedArticles } = this;
     const articles = await client.getArticles();
 
-    if (!Array.isArray(articles.data)) {
-      throw new Error(
-        `fail to fetch article list, response: ${JSON.stringify(articles)}`
-      );
-    }
-    let realArticles = articles.data
+    if (!Array.isArray(articles))
+      throw new Error(`fail to fetch article list, response...`);
+    let realArticles = articles
       .filter((article) =>
         repoConfig.onlyPublished ? !!article.published_at : true
       )
@@ -137,8 +134,8 @@ class Downloader {
 
     out.info(
       `total number of ${repoConfig.repo} repo articles: ${
-        articles.data.length
-      }, hit cache articles: ${articles.data.length - realArticles.length}`
+        articles.length
+      }, hit cache articles: ${articles.length - realArticles.length}`
     );
     if (!realArticles.length) return;
     const queue = new Queue({ concurrency: repoConfig.concurrency });

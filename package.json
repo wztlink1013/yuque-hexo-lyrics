@@ -49,7 +49,6 @@
   "dependencies": {
     "@babel/runtime-corejs2": "^7.12.5",
     "@babel/runtime-corejs3": "^7.12.5",
-    "@yuque/sdk": "^1.1.1",
     "chalk": "^2.4.1",
     "common-bin": "^2.7.3",
     "core-js": "^3.7.0",
@@ -65,7 +64,8 @@
     "queue": "^4.5.0",
     "rimraf": "^2.6.2",
     "update-check": "^1.5.3",
-    "urllib": "^2.29.1"
+    "extend2": "^1.0.0",
+    "urllib": "^2.33.1"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",

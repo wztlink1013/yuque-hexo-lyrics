@@ -1,4 +1,4 @@
-const SDK = require('@yuque/sdk');
+const SDK = require('./YuqueSDK/index');
 
 function handler(res) {
   // should handler error yourself
@@ -32,8 +32,28 @@ class YuqueClient extends SDK {
   // 获取文档列表
   async getArticles() {
     const { namespace } = this;
-    const result = await this.docs.list({ namespace });
-    return result;
+    const MAX_LIMIT = 100;
+    let options = {
+      namespace,
+      data: {
+        limit: MAX_LIMIT,
+        offset: 0
+      }
+    };
+    const { meta, data } = await this.docs.list(options);
+    if (meta.total <= MAX_LIMIT) return data || [];
+    const getAllData = async () => {
+      const count = Math.ceil(meta.total / MAX_LIMIT);
+      let totalData = data;
+      for (let i = 1; i < count; i++) {
+        options.data.offset = i * MAX_LIMIT;
+        const { data } = await this.docs.list(options);
+        totalData = totalData.concat(data);
+      }
+      return totalData;
+    };
+    const allData = await getAllData();
+    return allData || [];
   }
 
   // 获取指定slug文档
