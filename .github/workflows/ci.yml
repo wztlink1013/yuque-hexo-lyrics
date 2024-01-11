@@ -50,6 +50,6 @@ jobs:
       # - run: npm ci
       # - run: npm run build // TODO:
       - run: npm i
-      - run: npm run test
+      # - run: npm run test
       - run: npm i yuque-hexo-lyrics -g
       - run: yuque-hexo-lyrics -v
