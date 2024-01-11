@@ -1,6 +1,6 @@
 {
   "name": "yuque-hexo-lyrics",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "A downloader for articles from yuque",
   "author": "wztlink1013",
   "license": "MIT",
@@ -47,11 +47,8 @@
   ],
   "homepage": "https://github.com/wztlink1013/yuque-hexo-lyrics#readme",
   "dependencies": {
-    "@babel/runtime-corejs2": "^7.12.5",
-    "@babel/runtime-corejs3": "^7.12.5",
     "chalk": "^2.4.1",
     "common-bin": "^2.7.3",
-    "core-js": "^3.7.0",
     "debug": "^3.1.0",
     "depd": "^2.0.0",
     "ejs": "^2.6.1",
@@ -68,36 +65,22 @@
     "urllib": "^2.33.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.2",
-    "@babel/plugin-transform-runtime": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
-    "@babel/register": "^7.0.0",
     "@commitlint/cli": "^17.4.4",
-    "@jslib-book/cli": "^1.0.0",
-    "babel-plugin-istanbul": "^6.1.1",
     "commitizen": "^4.3.0",
     "commitlint": "^17.4.4",
     "commitlint-config-cz": "^0.13.3",
     "commitlint-config-git-commit-emoji": "^1.0.0",
     "conventional-changelog": "^3.1.25",
     "conventional-changelog-cli": "^2.2.2",
-    "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^3.3.0",
     "cz-customizable": "^7.0.0",
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "expect.js": "^0.3.1",
     "husky": "^7.0.0",
     "lint-staged": "^12.3.1",
-    "mocha": "^3.5.3",
     "nyc": "^15.1.0",
     "prettier": "2.5.1",
-    "pretty-quick": "^3.1.3",
-    "puppeteer": "^5.5.0",
-    "rollup": "^0.57.1",
-    "rollup-plugin-babel": "^4.0.3",
-    "rollup-plugin-commonjs": "^8.3.0",
-    "rollup-plugin-node-resolve": "^3.0.3"
+    "pretty-quick": "^3.1.3"
   }
 }
