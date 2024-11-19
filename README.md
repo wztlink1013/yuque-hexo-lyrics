@@ -110,7 +110,7 @@ yuque-hexo-lyrics sync
 |  | adapter | hexoMarkdown | 文档生成格式 (hexoMarkdown/hexoHtml/markdown) |
 |  | timeout | 200s | 超时时间 |
 |  | concurrency | 5 | 下载文章并发数 |
-|  | filterLastTimeAfter | '' | 下载文章的最后时间(YYYY-MM-DD) |
+|  | filterLastTimeAfter | '' | 指定日期后创建的文章不下载(YYYY-MM-DD) |
 |  | filterSlugs | [] | 过滤文章指定 slug |
 |  | filterSlugPrefix | '' | 按照文章 slug 前缀过滤 |
 |  | filterCates | [] | 过滤指定分类下的文章 |
