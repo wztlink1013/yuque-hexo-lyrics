@@ -1,6 +1,13 @@
 ## <small>1.1.11 (2024-11-19)</small>
 
 * :pencil2: docs(docx): add changelog ([d45ecdd](https://github.com/wztlink1013/yuque-hexo-lyrics/commit/d45ecdd))
+* :recycle: refactor(all): 添加配置字段；调整部分代码 ([2d3cb73](https://github.com/wztlink1013/yuque-hexo-lyrics/commit/2d3cb73))
+
+
+
+## <small>1.1.11 (2024-11-19)</small>
+
+* :pencil2: docs(docx): add changelog ([d45ecdd](https://github.com/wztlink1013/yuque-hexo-lyrics/commit/d45ecdd))
 
 
 
