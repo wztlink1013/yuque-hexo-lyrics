@@ -7,14 +7,16 @@ const cwd = process.cwd();
 
 module.exports = {
   cleanPosts() {
-    const { repos, cache } = config;
-    if (cache) {
-      const cacheDist = path.join(cwd, `${cache.path}.json`);
+    const { globalRepos, globalCacheConfig } = config;
+    // clear cache
+    if (globalCacheConfig) {
+      const cacheDist = path.join(cwd, `${globalCacheConfig.path}.json`);
       rimraf.sync(cacheDist);
       out.info(`remove local cache file: ${cacheDist}.`);
     }
-    repos.forEach((configItem) => {
-      const { postPath } = configItem;
+    // clear posts
+    globalRepos.forEach((repo) => {
+      const { postPath } = repo;
       const dist = path.join(cwd, postPath);
       out.info(`remove everything in the ${dist} folder.`);
       rimraf.sync(dist);

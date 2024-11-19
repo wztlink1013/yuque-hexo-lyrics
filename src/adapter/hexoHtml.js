@@ -10,7 +10,7 @@ const { JSDOM } = jsdom;
  * @return {String} text
  */
 module.exports = function (param) {
-  const { post, tocInfo } = param;
+  const { post, tocInfo, repoConfig } = param;
   const {
     title,
     slug: urlname,
@@ -22,6 +22,7 @@ module.exports = function (param) {
     body_html,
     tags: postTags
   } = post;
+  const { forceDownloadSecret } = repoConfig;
 
   return ejs.render(
     `---
@@ -41,7 +42,7 @@ module.exports = function (param) {
         belong_book: book.slug || ''
       }),
       content:
-        Number(secret) === 0
+        Number(secret) === 0 && !forceDownloadSecret
           ? `<div class="yuque-hexo-lyrics-secret">这是加密文章！</div>`
           : tranPreLabel(body_html)
     }

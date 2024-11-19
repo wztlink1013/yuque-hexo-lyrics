@@ -4,21 +4,31 @@ const out = require('./lib/out');
 const cwd = process.cwd();
 const token = process.env.YUQUE_TOKEN;
 
-const defaultCacheConfig = {
-  path: 'yuque-hexo-lyrics'
-};
+// NOTE: 默认缓存配置数据结构
+// const defaultCacheConfig = {
+//   path: 'yuque-hexo-lyrics' // 文件名
+// };
+
 const defaultRepoConfig = {
-  postPath: 'source/yuque',
-  mdNameFormat: 'title', // title / slug
+  postPath: 'source/yuque', // 知识库文章下载文件夹
+  timeout: '200s', // YuqueClientSDK 超时时间
   baseUrl: 'https://www.yuque.com/api/v2/',
+  token,
   login: '',
   repo: '',
-  adapter: 'hexoMarkdown', // hexoMarkdown / hexoHtml / markdown
   concurrency: 5, // 下载文章并发数
+  // 文章内容格式配置
+  mdNameFormat: 'title', // title / slug
+  adapter: 'hexoMarkdown', // hexoMarkdown / hexoHtml / markdown
+  // 过滤文章相关配置
+  assignSlugs: [], // 指定slug不被过滤 优先级高于过滤相关(filter开头/only开头)的配置字段
   onlyPublished: false, // 发布的文章
   onlyPublic: false, // 公开的文章
-  timeout: '200s', //YuqueClientSDK 超时时间
-  token
+  filterLastTimeAfter: '', // 下载文章的最后时间
+  filterSlugs: [], // 过滤文章指定slug
+  filterSlugPrefix: '', // 过滤文章slug前缀
+  filterCates: [], // 过滤文章分类
+  forceDownloadSecret: false // 强制下载加密文章
 };
 
 function loadConfig() {
@@ -28,13 +38,17 @@ function loadConfig() {
     return null;
   }
   const { yuqueConfig } = pkg;
-  const cache = Object.assign({}, defaultCacheConfig, yuqueConfig?.cache);
-  const repos = (yuqueConfig?.repos || []).map((item) =>
-    Object.assign({}, defaultRepoConfig, item)
-  );
+
+  !yuqueConfig?.cache?.path &&
+    out.warn('cache path does not exist, caching is disabled');
+
   return {
-    cache,
-    repos
+    // repos config
+    globalRepos: (yuqueConfig?.repos || []).map((item) =>
+      Object.assign({}, defaultRepoConfig, item)
+    ),
+    // cache config
+    globalCacheConfig: yuqueConfig?.cache?.path ? yuqueConfig.cache : null
   };
 }
 

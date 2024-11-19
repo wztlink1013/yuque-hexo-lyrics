@@ -1,3 +1,9 @@
+## <small>1.1.11 (2024-11-19)</small>
+
+* :pencil2: docs(docx): add changelog ([d45ecdd](https://github.com/wztlink1013/yuque-hexo-lyrics/commit/d45ecdd))
+
+
+
 ## <small>1.1.11 (2024-02-29)</small>
 
 * :bug: fix(all): 修复多知识库缓存文件配置；优化配置代码 ([dab0d15](https://github.com/wztlink1013/yuque-hexo-lyrics/commit/dab0d15))

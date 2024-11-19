@@ -1,22 +1,21 @@
 {
   "yuqueConfig": {
-    "cache": {
-      "path": "yuque-hexo-lyrics"
-    },
     "repos": [
       {
         "login": "wztlink1013",
-        "repo": "blog",
-        "postPath": "source/blog/",
+        "repo": "essay",
+        "postPath": "source/essay/",
         "mdNameFormat": "slug",
-        "adapter": "hexoMarkdown"
-      },
-      {
-        "login": "wztlink1013",
-        "repo": "website",
-        "postPath": "source/website/",
-        "mdNameFormat": "slug",
-        "adapter": "hexoMarkdown"
+        "adapter": "hexoHtml",
+        "filterLastTimeAfter": "2021-05-01",
+        "filterSlugs": [
+          "c47f3d9a749fd0229277f9e9604e69a2"
+        ],
+        "filterSlugPrefix": "cook_",
+        "filterCates": [
+          "随笔"
+        ],
+        "forceDownloadSecret": true
       }
     ]
   }

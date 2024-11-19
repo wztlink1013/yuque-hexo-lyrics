@@ -65,7 +65,7 @@ function parseMatter(body) {
  * @return {String} text
  */
 module.exports = function (param) {
-  const { post, tocInfo } = param;
+  const { post, tocInfo, repoConfig } = param;
   const {
     title,
     slug: urlname,
@@ -75,6 +75,7 @@ module.exports = function (param) {
     public: articlePublicStatus,
     book
   } = post;
+  const { forceDownloadSecret } = repoConfig;
   const cates = tocInfo[urlname] || '';
   const secret = articlePublicStatus;
   const belong_book = book.slug;
@@ -83,7 +84,7 @@ module.exports = function (param) {
   const { body, ...data } = parseRet;
 
   let raw = formatRaw(body);
-  if (secret === 0) {
+  if (secret === 0 && !forceDownloadSecret) {
     raw = '<div class="yuque-hexo-lyrics-secret">这是加密文章！</div>';
   }
   // FIXME: 时间格式化结果受代码运行宿主环境影响

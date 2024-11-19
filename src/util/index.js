@@ -80,7 +80,16 @@ exports.formatRaw = formatRaw;
  * @return {Boolean} isPost
  */
 function isPost(post) {
-  return lodash.isObject(post) && post.body && post.title;
+  const result = lodash.isObject(post) && post.body && post.title;
+  if (!result) {
+    out.error(
+      `[invalid post] slug title: `,
+      lodash.isObject(post),
+      post.body,
+      post.title
+    );
+  }
+  return result;
 }
 
 exports.isPost = isPost;

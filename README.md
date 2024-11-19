@@ -37,13 +37,14 @@
   - 自定义（eg：`tags` 语雀文档暂无相关标签字段接口）
 - 支持 `hexoMarkdown`、`hexoHtml`、`markdown` 三种 `format` 格式
 - 支持缓存配置
+- ···
 
 ## 命令指南
 
 ### Install
 
 ```bash
-npm i -g yuque-hexo-lyrics
+npm i yuque-hexo-lyrics -g
 ```
 
 ### Clean
@@ -77,26 +78,26 @@ yuque-hexo-lyrics sync
 
 ```json
 {
-  ···
   "yuqueConfig": {
-    "cache": {
-      "path": "yuque-hexo-lyrics"
-    },
     "repos": [
       {
         "login": "wztlink1013",
-        "repo": "website",
-        "postPath": "source/website/",
-        "mdNameFormat": "title",
-        "adapter": "hexoMarkdown"
-      },
-      ···
+        "repo": "blog",
+        "postPath": "source/blob/",
+        "mdNameFormat": "slug",
+        "adapter": "hexoHtml",
+        "filterLastTimeAfter": "2021-05-01",
+        "filterSlugs": ["c47f3d9a749fd0229277f9e9604e69a2"],
+        "filterSlugPrefix": "temp_",
+        "filterCates": ["Node"],
+        "forceDownloadSecret": true
+      }
     ]
   }
 }
 ```
 
-|  | 字段 | 默认值 | 描述 |
+| 一级字段 | 二级字段 | 默认值 | 描述 |
 | --- | --- | --- | --- |
 | cache | path | yuque-hexo-lyrics | 缓存文件名 |
 | repos | baseUrl | https://www.yuque.com/api/v2/ | 语雀 API 地址 |
@@ -109,6 +110,12 @@ yuque-hexo-lyrics sync
 |  | adapter | hexoMarkdown | 文档生成格式 (hexoMarkdown/hexoHtml/markdown) |
 |  | timeout | 200s | 超时时间 |
 |  | concurrency | 5 | 下载文章并发数 |
+|  | filterLastTimeAfter | '' | 下载文章的最后时间(YYYY-MM-DD) |
+|  | filterSlugs | [] | 过滤文章指定 slug |
+|  | filterSlugPrefix | '' | 按照文章 slug 前缀过滤 |
+|  | filterCates | [] | 过滤指定分类下的文章 |
+|  | forceDownloadSecret | false | 强制下载加密文章 |
+|  | assignSlugs | [] | 指定 slug 不被过滤 优先级高于过滤相关(filter 开头/only 开头)的配置字段 |
 
 > slug 是语雀的永久链接名，是几个随机字母和数字的混合字符串。
 

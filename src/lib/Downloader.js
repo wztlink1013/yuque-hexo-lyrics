@@ -34,13 +34,13 @@ const PICK_PROPERTY = [
  *
  */
 class Downloader {
-  constructor(repoConfig, cacheConfig) {
-    // 语雀client
+  constructor(repoConfig, globalCacheConfig) {
+    // 语雀SDK实例
     this.client = new YuqueClient(repoConfig);
-    // 加载配置
+    // 仓库配置
     this.repoConfig = repoConfig;
-    // 缓存文件目录
-    this.cacheFilePath = path.join(cwd, `${cacheConfig.path}.json`);
+    // 缓存配置
+    this.globalCacheConfig = globalCacheConfig;
     this.cacheContent = '';
     // 知识库目录
     this.postBasicPath = path.join(cwd, repoConfig.postPath);
@@ -59,14 +59,18 @@ class Downloader {
    * 文章下载 => 全量生成 markdown 文章
    */
   async autoUpdate() {
-    await this.readCache();
+    if (this.globalCacheConfig) {
+      await this.readCache();
+    }
     await this.fetchToc();
     await this.fetchArticles();
     this.generatePosts();
   }
   async readCache() {
     try {
-      this.cacheContent = fs.readFileSync(this.cacheFilePath).toString();
+      this.cacheContent = fs
+        .readFileSync(path.join(cwd, `${this.globalCacheConfig.path}.json`))
+        .toString();
     } catch (error) {
       out.warn('no cache file!');
       this.cacheContent = '{}';
@@ -109,28 +113,52 @@ class Downloader {
    */
   async fetchArticles() {
     const { client, repoConfig, cachedArticles } = this;
+    const {
+      filterLastTimeAfter,
+      onlyPublished,
+      onlyPublic,
+      filterSlugs,
+      filterSlugPrefix,
+      assignSlugs
+    } = repoConfig;
     const articles = await client.getArticles();
 
     if (!Array.isArray(articles))
       throw new Error(`fail to fetch article list, response...`);
     let realArticles = articles
-      .filter((article) =>
-        repoConfig.onlyPublished ? !!article.published_at : true
-      )
-      .filter((article) => (repoConfig.onlyPublic ? !!article.public : true))
+      .filter((_) => {
+        if (assignSlugs.length && assignSlugs.includes(_.slug)) return true;
+        if (
+          // published
+          (onlyPublished && !_.published_at) ||
+          // public
+          (onlyPublic && !_.public) ||
+          // filter by filterSlugPrefix
+          (filterSlugPrefix && _.slug.startsWith(filterSlugPrefix)) ||
+          // filter by filterSlugs
+          (filterSlugs.length && filterSlugs.includes(_.slug)) ||
+          // filter by filterLastTimeAfter
+          (filterLastTimeAfter &&
+            new Date(_.created_at) > new Date(filterLastTimeAfter))
+        )
+          return false;
+        return true;
+      })
       .map((article) => {
         this.generateCacheContent(article);
         return lodash.pick(article, PICK_PROPERTY);
       });
 
-    const asyncFilter = async (arr, predicate) => {
-      const results = await Promise.all(arr.map(predicate));
+    if (this.globalCacheConfig) {
+      const asyncFilter = async (arr, predicate) => {
+        const results = await Promise.all(arr.map(predicate));
 
-      return arr.filter((_v, index) => results[index]);
-    };
-    realArticles = await asyncFilter(realArticles, async (article) => {
-      return this.checkCacheArticle(article);
-    });
+        return arr.filter((_v, index) => results[index]);
+      };
+      realArticles = await asyncFilter(realArticles, async (article) => {
+        return this.checkCacheArticle(article);
+      });
+    }
 
     out.info(
       `total number of ${repoConfig.repo} repo articles: ${
@@ -249,11 +277,9 @@ class Downloader {
    */
   generatePost(post) {
     if (!isPost(post)) {
-      out.error(`invalid post: ${post}`);
       return;
     }
-
-    const { postBasicPath } = this;
+    const { postBasicPath, repoConfig } = this;
     const { mdNameFormat, adapter } = this.repoConfig;
     const fileName = filenamify(post[mdNameFormat]);
     const postPath = path.join(postBasicPath, `${fileName}.md`);
@@ -268,8 +294,21 @@ class Downloader {
     out.info(`generate post file: ${postPath}`);
     const mdContent = transform({
       post,
-      tocInfo: this.tocList
+      tocInfo: this.tocList,
+      repoConfig
     });
+    if (repoConfig?.filterCates?.length) {
+      const existFilterCate = (this.tocList?.[post?.slug] || []).find((c) =>
+        repoConfig.filterCates.includes(c)
+      );
+      if (existFilterCate) {
+        out.info(
+          `Article filtered by specified category: ${post.title}. `,
+          existFilterCate
+        );
+        return;
+      }
+    }
     fs.writeFileSync(postPath, mdContent, {
       encoding: 'UTF8'
     });

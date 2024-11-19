@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 const Command = require('common-bin');
 const initConfig = require('../config');
-// const cleaner = require('../lib/cleaner');
 const Downloader = require('../lib/Downloader');
 const out = require('../lib/out');
 
@@ -16,20 +15,23 @@ class SyncCommand extends Command {
   }
 
   async run() {
-    const { repos, cache } = initConfig;
-    for (let i in repos) {
-      const repoConfig = repos[i];
+    const { globalRepos, globalCacheConfig } = initConfig;
+    // download articles
+    for (let i in globalRepos) {
+      const repoConfig = globalRepos[i];
       if (!repoConfig) process.exit(0);
-      const downloader = new Downloader(repoConfig, cache);
+      const downloader = new Downloader(repoConfig, globalCacheConfig);
       await downloader.autoUpdate();
       this.cacheContents[repoConfig.repo] =
         downloader.cacheObj[repoConfig.repo];
       out.success(`All articles of ${repoConfig.repo} have been downloaded!`);
     }
-    this.generateCacheFile(
-      path.join(cwd, `${cache.path}.json`),
-      this.cacheContents
-    );
+    // generate cache file
+    globalCacheConfig &&
+      this.generateCacheFile(
+        path.join(cwd, `${globalCacheConfig.path}.json`),
+        this.cacheContents
+      );
   }
 
   /**
