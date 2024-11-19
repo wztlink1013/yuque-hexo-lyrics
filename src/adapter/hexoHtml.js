@@ -118,12 +118,12 @@ const tranPreLabel = (str) => {
     alert.parentNode.replaceChild(blockquoteElement, alert);
   });
 
-  return body.innerHTML.replace(
-    /<pre data-language="(([\s\S])*?)<\/pre>/g,
-    (data) =>
-      `${data.slice(0, -6)}\n</code></pre>\n`.replace(
-        /<.*?>/,
-        () => `\n<pre><code>`
-      )
-  );
+  return `
+
+{% raw %}
+
+${body.innerHTML}
+
+{% endraw %}
+  `;
 };
