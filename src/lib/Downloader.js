@@ -288,7 +288,7 @@ class Downloader {
     try {
       transform = require(path.join(__dirname, '../adapter', adapter));
     } catch (error) {
-      out.error(`adpater (${adapter}) is invalid.`);
+      out.error(`adpater (${adapter}) is invalid.`, error);
       process.exit(-1);
     }
     out.info(`generate post file: ${postPath}`);
