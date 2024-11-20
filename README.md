@@ -28,16 +28,16 @@
 
 相比原插件增加的功能：
 
-- 支持语雀多个知识库的下载至指定文件夹
+- **支持语雀多个知识库的下载至指定文件夹** 
 - 支持加密文章的特殊化处理
-- 无需对语雀文档添加 `front-matter` 字段，常用字段自动拉取
+- 无需对语雀文档内容头部添加 `front-matter` 字段，插件已做常用字段的自动映射，如下
   - 基本字段：`title`、`date`、`updated`
   - 根据语雀系统自动拉取：`urlname`、`word_count`、`secret`、`belong_book`
   - 支持语雀系统上文档的目录至 `hexo` 中的 `categories` 字段
   - 自定义（eg：`tags` 语雀文档暂无相关标签字段接口）
 - 支持 `hexoMarkdown`、`hexoHtml`、`markdown` 三种 `format` 格式
 - 支持缓存配置
-- ···
+- 支持多种过滤文章字段配置，详见下面配置表
 
 ## 命令指南
 
@@ -99,7 +99,7 @@ yuque-hexo-lyrics sync
 
 | 一级字段 | 二级字段 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| cache | path | yuque-hexo-lyrics | 缓存文件名 |
+| cache | path | 无 | 缓存文件名，默认不开启缓存（缓存依据是根据文章的标题和更新时间是否一致来做的） |
 | repos | baseUrl | https://www.yuque.com/api/v2/ | 语雀 API 地址 |
 |  | login | - | 语雀 login (group), 也称为个人路径 |
 |  | repo | - | 语雀仓库短名称，也称为语雀知识库路径 |
@@ -123,20 +123,8 @@ yuque-hexo-lyrics sync
 
 ### front-matter 配置
 
-- 插件会自动拉取[大多数 Hexo 字段](#特性)，使得在语雀中写文章不用每次在头部都需要手动写 `front-matter`，以下字段后续还会扩充
-- 除去大多数上述字段，有少部分字段目前难以适配，比如`tags`和`Hexo`大多数主题自定义`front-matter`，语雀系统暂未开放文档的标签相关字段，所以写文章特别注重标签的用户只能以下面方式来添加 `front-matter`:
+- 插件会自动拉取[大多数 Hexo 字段](#特性)，使得在语雀中写文章不用每次在头部都需要手动写 `front-matter`，部分字段后续还会扩充
 
-```
----
-tags: [hexo, blog]
----
-
-article description
-
-<!-- more -->
-
-article detail
-```
 
 ### 语雀图片存在防盗链问题
 
