@@ -6,7 +6,7 @@
         "repo": "essay",
         "postPath": "source/essay/",
         "mdNameFormat": "slug",
-        "adapter": "hexoHtml",
+        "adapter": "mdxHtml",
         "filterLastTimeAfter": "2021-05-01",
         "filterSlugs": [
           "c47f3d9a749fd0229277f9e9604e69a2"
@@ -15,7 +15,9 @@
         "filterCates": [
           "随笔"
         ],
-        "forceDownloadSecret": true
+        "forceDownloadSecret": true,
+        "assignSlugs": [],
+        "fileSuffix": "mdx"
       }
     ]
   }

@@ -28,7 +28,7 @@
 
 相比原插件增加的功能：
 
-- **支持语雀多个知识库的下载至指定文件夹** 
+- **支持语雀多个知识库的下载至指定文件夹**
 - 支持加密文章的特殊化处理
 - 无需对语雀文档内容头部添加 `front-matter` 字段，插件已做常用字段的自动映射，如下
   - 基本字段：`title`、`date`、`updated`
@@ -90,7 +90,8 @@ yuque-hexo-lyrics sync
         "filterSlugs": ["c47f3d9a749fd0229277f9e9604e69a2"],
         "filterSlugPrefix": "temp_",
         "filterCates": ["Node"],
-        "forceDownloadSecret": true
+        "forceDownloadSecret": true,
+        "assignSlugs": ["fasdfasdfasfsf"]
       }
     ]
   }
@@ -124,7 +125,6 @@ yuque-hexo-lyrics sync
 ### front-matter 配置
 
 - 插件会自动拉取[大多数 Hexo 字段](#特性)，使得在语雀中写文章不用每次在头部都需要手动写 `front-matter`，部分字段后续还会扩充
-
 
 ### 语雀图片存在防盗链问题
 

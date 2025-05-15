@@ -22,6 +22,7 @@ const defaultRepoConfig = {
   adapter: 'hexoMarkdown', // hexoMarkdown / hexoHtml / markdown
   // 过滤文章相关配置
   assignSlugs: [], // 指定slug不被过滤 优先级高于过滤相关(filter开头/only开头)的配置字段
+  fileSuffix: 'md',
   onlyPublished: false, // 发布的文章
   onlyPublic: false, // 公开的文章
   filterLastTimeAfter: '', // 下载文章的最后时间

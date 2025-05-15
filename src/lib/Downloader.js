@@ -230,7 +230,7 @@ class Downloader {
       cwd,
       `${repoConfig.postPath}${
         repoConfig.mdNameFormat === 'title' ? title : slug
-      }.md`
+      }.${repoConfig.fileSuffix}`
     );
     try {
       if (fs.existsSync(filePath)) {
@@ -280,9 +280,9 @@ class Downloader {
       return;
     }
     const { postBasicPath, repoConfig } = this;
-    const { mdNameFormat, adapter } = this.repoConfig;
+    const { mdNameFormat, adapter, fileSuffix } = repoConfig;
     const fileName = filenamify(post[mdNameFormat]);
-    const postPath = path.join(postBasicPath, `${fileName}.md`);
+    const postPath = path.join(postBasicPath, `${fileName}.${fileSuffix}`);
     let transform;
 
     try {
